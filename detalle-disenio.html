@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Personalizar Diseño — LOOK LAB IVVI</title>
+  <link rel="stylesheet" href="src/styles/main.css"/>
+  <link rel="stylesheet" href="src/styles/navbar.css"/>
+  <link rel="icon" type="image/png" href="src/assets/images/faviiicon.png">
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    #app { padding-top: 62px; }
+
+    /* ── BREADCRUMB ── */
+    .det-breadcrumb {
+      display: flex; align-items: center; gap: 6px;
+      padding: 10px clamp(18px,5vw,80px);
+      background: var(--cream);
+      border-bottom: 1px solid var(--cream-mid);
+      font-size: 10.5px;
+      color: var(--gray-400); letter-spacing: .03em;
+    }
+    .det-breadcrumb a { color: var(--gray-600); transition: color .2s; text-decoration: none; }
+    .det-breadcrumb a:hover { color: var(--purple); }
+    .det-breadcrumb span:last-child { color: var(--carbon); font-weight: 500; }
+
+    /* ══ LAYOUT PRINCIPAL ══ */
+    .det-main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: calc(100vh - 62px);
+      background: var(--white);
+      animation: fadeUp .5s ease both;
+    }
+
+    /* ══ LADO IZQUIERDO — Galería/Visualizador ══ */
+    .det-galeria {
+      position: sticky;
+      top: 62px;
+      height: calc(100vh - 62px);
+      display: flex;
+      flex-direction: column;
+      background: #f5f4f1;
+      overflow: hidden;
+    }
+
+    /* Imagen principal grande */
+    .det-foto-principal {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .det-foto-main {
+      width: 100%; height: 100%;
+      object-fit: contain;
+      padding: 5%;
+      transition: transform .5s cubic-bezier(.25,.46,.45,.94), opacity .25s;
+      display: block;
+    }
+    .det-foto-main.cambiando { opacity: 0; transform: scale(.97); }
+
+    /* Etiqueta de la combinación activa */
+    .det-combo-label {
+      position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+      background: rgba(28,26,23,.65); backdrop-filter: blur(8px);
+      color: rgba(250,249,246,.85);
+      font-family: var(--font-body); font-size: 10px; letter-spacing: .1em;
+      text-transform: uppercase; font-weight: 600;
+      border-radius: 20px; padding: 6px 16px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* Badge */
+    .det-badge-wrap {
+      position: absolute; top: 16px; left: 16px;
+      display: flex; gap: 6px;
+    }
+    .det-badge {
+      font-family: var(--font-body);
+      font-size: 8px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+      padding: 4px 9px; border-radius: 20px;
+    }
+    .det-badge--ar { background: var(--purple); color: #fff; }
+    .det-badge--limited { background: var(--carbon); color: var(--purple-xlight); }
+
+    /* Thumbnails */
+    .det-thumbs-row {
+      display: flex;
+      gap: 4px;
+      padding: 10px 12px;
+      background: #efefec;
+      border-top: 1px solid #e0deda;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .det-thumbs-row::-webkit-scrollbar { display: none; }
+    .det-thumb {
+      width: 56px; height: 72px;
+      flex-shrink: 0;
+      border: 2px solid transparent;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .18s, transform .18s;
+    }
+    .det-thumb:hover { border-color: var(--purple-xlight); transform: translateY(-2px); }
+    .det-thumb.active { border-color: var(--purple); }
+    .det-thumb img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+
+    /* ══ LADO DERECHO — Personalizador ══ */
+    .det-info {
+      padding: clamp(24px, 4vw, 48px) clamp(20px, 5vw, 56px);
+      overflow-y: auto;
+      max-height: calc(100vh - 62px);
+      position: sticky; top: 62px; align-self: start;
+      display: flex; flex-direction: column; gap: 0;
+      border-left: 1px solid var(--cream-mid);
+    }
+    .det-info::-webkit-scrollbar { width: 2px; }
+    .det-info::-webkit-scrollbar-thumb { background: var(--cream-mid); }
+
+    /* Meta header */
+    .det-meta-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .det-numero {
+      font-family: var(--font-body);
+      font-size: 9px; font-weight: 600; letter-spacing: .18em;
+      color: var(--gray-200); text-transform: uppercase;
+    }
+    .det-flor {
+      font-family: var(--font-display);
+      font-size: .82rem; font-weight: 300; font-style: italic;
+    }
+    .det-flor--rosa { color: var(--rosa-accent); }
+    .det-flor--sol  { color: var(--sol-accent); }
+    .det-flor--glox { color: var(--glox-accent); }
+
+    .det-titulo {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 3.2vw, 2.8rem);
+      font-weight: 300; color: var(--carbon);
+      line-height: 1.05; letter-spacing: -.01em;
+      margin-bottom: 6px;
+    }
+    .det-subtitulo-desc {
+      font-family: var(--font-body);
+      font-size: 10px; font-weight: 500; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--gray-400);
+      margin-bottom: 20px;
+    }
+
+    /* ── PERSONALIZADOR IVVI ── */
+    .personalizador {
+      background: var(--cream);
+      border-radius: 14px;
+      padding: 20px 20px 16px;
+      margin-bottom: 20px;
+      border: 1px solid var(--cream-mid);
+    }
+    .personalizador-titulo {
+      font-family: var(--font-body);
+      font-size: 8px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--purple); background: var(--purple-tint);
+      display: inline-block; border-radius: 10px; padding: 3px 10px;
+      margin-bottom: 16px;
+    }
+
+    /* Etiqueta de sección */
+    .det-selector-label {
+      font-family: var(--font-body);
+      font-size: 9.5px; font-weight: 700; letter-spacing: .15em;
+      text-transform: uppercase; color: var(--gray-400);
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 10px;
+    }
+    .det-selector-label .valor-activo {
+      color: var(--carbon); font-weight: 600; letter-spacing: .05em;
+      text-transform: none; font-size: 11px;
+    }
+
+    /* ── SELECTOR COLOR DE FONDO ── */
+    .det-colores-fondo {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 18px;
+    }
+    .det-color-swatch {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      cursor: pointer;
+      transition: transform .18s, border-color .18s, box-shadow .18s;
+      position: relative;
+      outline: none;
+    }
+    .det-color-swatch:hover { transform: scale(1.1); }
+    .det-color-swatch.active {
+      border-color: var(--carbon);
+      box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--carbon);
+      transform: scale(1.08);
+    }
+    .det-color-swatch::after {
+      content: attr(data-nombre);
+      position: absolute;
+      bottom: calc(100% + 8px); left: 50%;
+      transform: translateX(-50%);
+      background: var(--carbon); color: #fff;
+      font-size: 9px; letter-spacing: .06em; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 4px;
+      white-space: nowrap; pointer-events: none;
+      opacity: 0; transition: opacity .15s;
+    }
+    .det-color-swatch:hover::after { opacity: 1; }
+
+    /* ── SELECTOR DE CORTE ── */
+    .det-cortes {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .det-corte-btn {
+      font-family: var(--font-body);
+      font-size: 11px; font-weight: 600; letter-spacing: .06em;
+      color: var(--gray-600);
+      background: var(--white);
+      border: 1.5px solid var(--cream-mid);
+      border-radius: 24px;
+      padding: 9px 18px;
+      cursor: pointer;
+      transition: background .18s, color .18s, border-color .18s, transform .15s;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .det-corte-btn:hover {
+      border-color: var(--purple-xlight);
+      color: var(--purple);
+      background: var(--purple-tint);
+    }
+    .det-corte-btn.active {
+      background: var(--carbon);
+      color: #fff;
+      border-color: var(--carbon);
+      transform: scale(1.03);
+    }
+    .corte-icon {
+      width: 16px; height: 22px;
+      display: inline-block;
+      border-radius: 0 0 3px 3px;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .corte-icon--clasico {
+      width: 13px;
+      background: currentColor;
+      clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%);
+    }
+    .corte-icon--oversize {
+      width: 18px;
+      background: currentColor;
+      clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 10% 100%);
+    }
+    .corte-icon--boxy {
+      width: 16px;
+      background: currentColor;
+      clip-path: polygon(5% 0%, 95% 0%, 100% 100%, 0% 100%);
+    }
+
+    .det-corte-desc {
+      font-size: .78rem; color: var(--gray-400);
+      line-height: 1.5; font-family: var(--font-body);
+      font-style: italic; letter-spacing: .01em;
+      min-height: 32px;
+      transition: opacity .2s;
+    }
+
+    /* Separador */
+    .det-divider { height: 1px; background: var(--cream-mid); margin: 16px 0; }
+
+    /* ── TALLAS ── */
+    .det-tallas-wrap { margin-bottom: 16px; }
+    .det-tallas-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .det-guia-link {
+      font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--gray-400); border-bottom: 1px solid var(--cream-mid);
+      cursor: pointer; transition: color .15s, border-color .15s;
+      background: none; border-top: none; border-left: none; border-right: none;
+      padding: 0; font-family: var(--font-body);
+    }
+    .det-guia-link:hover { color: var(--purple); border-bottom-color: var(--purple); }
+    .det-tallas { display: flex; flex-wrap: wrap; gap: 6px; }
+    .det-talla {
+      font-family: var(--font-body);
+      font-size: 11px; font-weight: 600; letter-spacing: .07em;
+      color: var(--gray-600); background: var(--cream-dark);
+      border: 1.5px solid var(--cream-mid); border-radius: 6px;
+      padding: 9px 16px; cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s, transform .15s;
+      min-width: 46px; text-align: center;
+    }
+    .det-talla:hover { border-color: var(--purple-xlight); color: var(--purple); background: var(--purple-tint); }
+    .det-talla.selected { background: var(--purple); color: #fff; border-color: var(--purple); transform: scale(1.06); }
+
+    /* Guía de tallas */
+    .det-guia-talla {
+      margin-bottom: 16px;
+      border: 1px solid var(--cream-mid);
+      border-radius: 8px; overflow: hidden;
+    }
+    .det-guia-talla summary {
+      display: flex; align-items: center; gap: 7px;
+      padding: 10px 14px;
+      font-family: var(--font-body);
+      font-size: 11px; font-weight: 500; letter-spacing: .06em;
+      color: var(--gray-600); cursor: pointer;
+      background: var(--cream-dark);
+      transition: background .15s, color .15s;
+      list-style: none;
+    }
+    .det-guia-talla summary:hover { background: var(--purple-tint); color: var(--purple); }
+    .det-guia-talla summary::-webkit-details-marker { display: none; }
+    .det-guia-tabla { padding: 12px; overflow-x: auto; }
+    .det-guia-tabla table { width: 100%; border-collapse: collapse; font-size: .76rem; color: var(--gray-600); }
+    .det-guia-tabla th {
+      font-family: var(--font-body);
+      font-size: 8.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--gray-400); padding: 6px 8px;
+      border-bottom: 1px solid var(--cream-mid); text-align: left; white-space: nowrap;
+    }
+    .det-guia-tabla td { padding: 6px 8px; border-bottom: 1px solid var(--cream-mid); }
+    .det-guia-tabla tr:last-child td { border-bottom: none; }
+    .det-guia-tabla tr:hover td { background: var(--cream-dark); }
+    .det-guia-tabla td:first-child { font-weight: 700; color: var(--purple); }
+
+    /* ── DESCRIPCIÓN ── */
+    .det-descripcion {
+      font-family: var(--font-display);
+      font-size: .88rem; line-height: 1.8; color: var(--gray-600);
+      margin-bottom: 16px;
+    }
+    .det-descripcion p { margin-bottom: 8px; }
+    .det-descripcion em { color: var(--purple); }
+
+    /* ── COMPOSICIÓN ── */
+    .det-spec-bloque { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+    .det-spec-label {
+      display: flex; align-items: center; gap: 5px;
+      font-family: var(--font-body);
+      font-size: 9px; font-weight: 600; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--purple);
+    }
+    .det-tela { display: flex; flex-direction: column; gap: 5px; }
+    .det-tela-item { display: flex; align-items: center; gap: 10px; }
+    .det-tela-pct { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: var(--purple); min-width: 44px; }
+    .det-tela-nombre { font-size: .78rem; color: var(--gray-600); }
+    .det-cuidados { display: flex; flex-direction: column; gap: 4px; }
+    .det-cuidado-item { font-size: .77rem; color: var(--gray-600); line-height: 1.5; }
+
+    /* ── CTAs ── */
+    .det-ctas {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-top: 6px; margin-bottom: 8px;
+    }
+    .btn-primary-grande {
+      flex: 1; min-width: 160px;
+      font-family: var(--font-body);
+      font-size: 12px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase;
+      background: var(--carbon); color: #fff;
+      border: none; border-radius: 30px;
+      padding: 15px 24px; cursor: pointer;
+      transition: background .18s, transform .15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      text-decoration: none;
+    }
+    .btn-primary-grande:hover { background: var(--purple); transform: translateY(-1px); }
+    .btn-outline-grande {
+      font-family: var(--font-body);
+      font-size: 11px; font-weight: 600; letter-spacing: .08em;
+      color: var(--gray-600);
+      background: transparent;
+      border: 1.5px solid var(--cream-mid); border-radius: 30px;
+      padding: 14px 20px; cursor: pointer;
+      transition: border-color .18s, color .18s;
+      text-decoration: none; display: flex; align-items: center; gap: 6px;
+    }
+    .btn-outline-grande:hover { border-color: var(--purple); color: var(--purple); }
+
+    .det-ar-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,.7); flex-shrink: 0;
+      animation: pulse-dot 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(.5)} }
+
+    /* ══ SECCIÓN 3D ══ */
+    .det-3d-section {
+      padding: clamp(24px,4vw,56px) clamp(20px,5vw,64px);
+      background: var(--cream);
+      border-top: 1px solid var(--cream-mid);
+    }
+    .det-3d-label {
+      font-family: var(--font-body);
+      font-size: 9px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--purple); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .det-3d-label::before { content: ''; display: inline-block; width: 5px; height: 5px; background: var(--purple); border-radius: 50%; }
+    .det-3d-wrap {
+      position: relative; width: 100%; max-width: 560px;
+      margin: 0 auto;
+      border-radius: 12px; overflow: hidden;
+      background: var(--cream-dark); box-shadow: 0 4px 24px rgba(0,0,0,.08);
+    }
+    model-viewer {
+      width: 100%; height: 400px;
+      --poster-color: transparent; outline: none; display: block;
+    }
+    .det-3d-fallback {
+      display: none; align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px;
+      height: 200px; color: var(--gray-400); font-size: .84rem; text-align: center;
+    }
+    .det-3d-fallback svg { opacity: .3; }
+    .det-3d-wrap.sin-modelo model-viewer { display: none; }
+    .det-3d-wrap.sin-modelo .det-3d-fallback { display: flex; }
+    .btn-ar-floating {
+      position: absolute; bottom: 14px; right: 14px;
+      background: var(--purple); color: #fff; border: none;
+      padding: 8px 16px; border-radius: 28px;
+      font-family: var(--font-body); font-size: 11px; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(74,29,122,.35); letter-spacing: .05em;
+    }
+
+    /* ── Botón zoom en foto principal ── */
+    .det-zoom-btn {
+      position: absolute; bottom: 16px; right: 16px;
+      background: rgba(13,12,10,.55); color: rgba(250,249,246,.9);
+      border: 1px solid rgba(255,255,255,.15); border-radius: 50%;
+      width: 38px; height: 38px;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px); cursor: zoom-in; z-index: 10;
+      transition: background .15s, transform .15s;
+      font-size: 15px;
+    }
+    .det-zoom-btn:hover { background: rgba(74,29,122,.65); transform: scale(1.08); }
+
+    /* ══ LIGHTBOX DE PRENDA (foto principal) ══ */
+    .lb-prenda-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(13,12,10,.92); backdrop-filter: blur(12px);
+      z-index: 3000; opacity: 0; pointer-events: none; transition: opacity .22s;
+    }
+    .lb-prenda-backdrop.visible { opacity: 1; pointer-events: all; }
+
+    .lb-prenda {
+      position: fixed; inset: 0; z-index: 3001;
+      display: flex; align-items: stretch;
+      opacity: 0; pointer-events: none;
+      transition: opacity .22s;
+    }
+    .lb-prenda.visible { opacity: 1; pointer-events: all; }
+
+    /* Área imagen grande */
+    .lb-prenda-main {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 32px 16px 32px 16px; position: relative; min-width: 0;
+    }
+    .lb-prenda-img {
+      max-width: 100%; max-height: 100%;
+      object-fit: contain; border-radius: 10px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.5);
+      transition: opacity .2s;
+    }
+    .lb-prenda-img.cambiando { opacity: 0; }
+
+    /* Navegación flechas */
+    .lb-prenda-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(13,12,10,.5); color: rgba(250,249,246,.9);
+      border: 1px solid rgba(255,255,255,.12); border-radius: 50%;
+      width: 44px; height: 44px; font-size: 1.4rem;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(6px); cursor: pointer; z-index: 10;
+      transition: background .15s;
+    }
+    .lb-prenda-nav:hover { background: rgba(74,29,122,.55); }
+    .lb-prenda-prev { left: 12px; }
+    .lb-prenda-next { right: 12px; }
+
+    /* Botón cerrar */
+    .lb-prenda-close {
+      position: fixed; top: 18px; right: 18px;
+      background: rgba(13,12,10,.6); color: rgba(250,249,246,.9);
+      border: 1px solid rgba(255,255,255,.12); border-radius: 50%;
+      width: 38px; height: 38px; font-size: .95rem;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px); z-index: 3002; cursor: pointer;
+      transition: background .15s;
+    }
+    .lb-prenda-close:hover { background: rgba(74,29,122,.6); }
+
+    /* Contador */
+    .lb-prenda-counter {
+      position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+      background: rgba(13,12,10,.55); color: rgba(250,249,246,.7);
+      font-family: var(--font-body); font-size: 10px; letter-spacing: .1em;
+      padding: 4px 13px; border-radius: 20px; backdrop-filter: blur(6px);
+      white-space: nowrap;
+    }
+
+    /* Panel de thumbnails lateral */
+    .lb-prenda-thumbs {
+      width: 86px; flex-shrink: 0;
+      display: flex; flex-direction: column; gap: 6px;
+      padding: 48px 10px 48px 0;
+      overflow-y: auto; scrollbar-width: none;
+    }
+    .lb-prenda-thumbs::-webkit-scrollbar { display: none; }
+    .lb-prenda-thumb {
+      width: 68px; height: 88px; flex-shrink: 0;
+      border-radius: 7px; overflow: hidden; background: rgba(255,255,255,.06);
+      border: 2px solid rgba(255,255,255,.1); cursor: pointer;
+      transition: border-color .18s, transform .18s;
+    }
+    .lb-prenda-thumb:hover { border-color: rgba(255,255,255,.4); transform: scale(1.05); }
+    .lb-prenda-thumb.active { border-color: var(--purple); }
+    .lb-prenda-thumb img { width: 100%; height: 100%; object-fit: contain; padding: 5px; }
+
+    /* En móvil: thumbs abajo */
+    @media (max-width: 600px) {
+      .lb-prenda { flex-direction: column; }
+      .lb-prenda-thumbs {
+        width: auto; height: 90px; flex-direction: row;
+        padding: 0 10px 12px;
+        overflow-x: auto; overflow-y: hidden;
+      }
+      .lb-prenda-thumb { width: 62px; height: 78px; }
+      .lb-prenda-main { padding: 52px 48px 12px; }
+    }
+
+    /* ══ FOTOS REALES ══ */
+    .det-fotos-reales {
+      padding: clamp(24px,4vw,56px) clamp(20px,5vw,64px);
+      background: var(--white); border-top: 1px solid var(--cream-mid);
+    }
+    .det-fotos-reales-label {
+      font-family: var(--font-body);
+      font-size: 9px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--gray-400); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .det-fotos-reales-label::before { content: ''; display: inline-block; width: 24px; height: 1.5px; background: var(--cream-mid); }
+    .det-fotos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px;
+    }
+    .det-foto-real-item {
+      aspect-ratio: 3/4; overflow: hidden;
+      border-radius: 8px; background: var(--cream-dark); cursor: zoom-in;
+      transition: transform .25s, box-shadow .25s;
+    }
+    .det-foto-real-item:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.1); }
+    .det-foto-real-item img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; }
+    .det-foto-real-item:hover img { transform: scale(1.06); }
+
+    /* ══ LIGHTBOX ══ */
+    .det-lightbox {
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%,-50%) scale(.94);
+      z-index: 2000; max-width: 90vw; max-height: 90vh;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s, transform .2s;
+    }
+    .det-lightbox.visible { opacity: 1; pointer-events: all; transform: translate(-50%,-50%) scale(1); }
+    .det-lightbox-img { max-width: 88vw; max-height: 88vh; object-fit: contain; display: block; border-radius: 12px; box-shadow: 0 24px 80px rgba(0,0,0,.4); }
+    .det-lightbox-close {
+      position: fixed; top: 20px; right: 20px;
+      background: rgba(13,12,10,.65); color: var(--cream);
+      border: 1px solid rgba(255,255,255,.12); border-radius: 50%;
+      width: 36px; height: 36px; font-size: .9rem;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px); z-index: 2001; cursor: pointer;
+      transition: background .15s;
+    }
+    .det-lightbox-close:hover { background: rgba(74,29,122,.6); }
+    .det-lightbox-nav {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      background: rgba(13,12,10,.55); color: var(--cream);
+      border: 1px solid rgba(255,255,255,.1); border-radius: 50%;
+      width: 42px; height: 42px; font-size: 1.3rem;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px); z-index: 2001; cursor: pointer;
+      transition: background .15s;
+    }
+    .det-lightbox-nav:hover { background: rgba(74,29,122,.5); }
+    .det-lb-prev { left: 16px; }
+    .det-lb-next { right: 16px; }
+    .det-lightbox-counter {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: rgba(13,12,10,.6); color: rgba(250,249,246,.6);
+      font-size: 10px; letter-spacing: .1em; padding: 5px 14px;
+      border-radius: 20px; backdrop-filter: blur(8px); z-index: 2001;
+    }
+    .det-lightbox-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(13,12,10,.88); backdrop-filter: blur(10px);
+      z-index: 1999; opacity: 0; pointer-events: none; transition: opacity .2s;
+    }
+    .det-lightbox-backdrop.visible { opacity: 1; pointer-events: all; }
+
+    /* ══ RELACIONADOS ══ */
+    .det-relacionados {
+      background: var(--cream);
+      padding: clamp(24px,4vw,56px) clamp(20px,5vw,64px);
+      border-top: 1px solid var(--cream-mid);
+    }
+    .det-rel-titulo {
+      font-family: var(--font-display);
+      font-size: clamp(1.2rem, 2vw, 1.7rem);
+      font-weight: 300; color: var(--carbon);
+      margin-bottom: 24px; text-align: center;
+    }
+    .det-rel-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 2px; background: var(--cream-mid);
+    }
+    .det-rel-card {
+      background: var(--white); text-decoration: none;
+      display: flex; flex-direction: column; overflow: hidden;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .det-rel-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.1); z-index: 2; }
+    .det-rel-img { aspect-ratio: 1; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--cream-dark); }
+    .det-rel-img img { width: 72%; height: 72%; object-fit: contain; transition: transform .2s; }
+    .det-rel-card:hover .det-rel-img img { transform: scale(1.07); }
+    .det-rel-body { padding: 12px 14px; border-top: 1px solid var(--cream-mid); display: flex; flex-direction: column; gap: 2px; }
+    .det-rel-body strong { font-family: var(--font-body); font-size: .8rem; font-weight: 500; color: var(--carbon); }
+
+    /* Footer */
+    .col-footer {
+      text-align: center; padding: 16px; font-size: .74rem; color: var(--gray-400);
+      border-top: 1px solid var(--cream-mid); background: var(--cream);
+    }
+    .col-footer a { color: var(--purple); }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 900px) {
+      .det-main { grid-template-columns: 1fr; }
+      .det-galeria { position: static; height: auto; }
+      .det-foto-principal { height: 55vw; min-height: 280px; }
+      .det-info { position: static; max-height: none; border-left: none; border-top: 1px solid var(--cream-mid); }
+      .det-rel-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .det-foto-principal { height: 72vw; }
+      .det-cortes { gap: 6px; }
+      .det-corte-btn { font-size: 10px; padding: 8px 14px; }
+      .det-rel-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <nav class="navbar" id="mainNav">
+    <a href="index.html">
+      <div class="brand-container">
+        <img src="src/assets/images/logo.png" class="brand-logo" alt="Logo">
+        <span class="brand-name">LOOK LAB IVVI</span>
+      </div>
+    </a>
+    <button class="navbar-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="navbar-links" id="navLinks">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="coleccion.html" class="active">Colección</a></li>
+      <li><a href="disenios-ra.html">Diseños RA <span class="badge-ar">AR</span></a></li>
+      <li><a href="probador.html">Probador Virtual</a></li>
+    </ul>
+  </nav>
+
+  <!-- BREADCRUMB -->
+  <nav class="det-breadcrumb" aria-label="Ruta de navegación">
+    <a href="index.html">Inicio</a>
+    <span>›</span>
+    <a href="coleccion.html">Colección</a>
+    <span>›</span>
+    <span id="breadNombre">Diseño</span>
+  </nav>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="det-main" id="detMain">
+
+    <!-- Galería izquierda -->
+    <aside class="det-galeria">
+      <div class="det-foto-principal" id="detFotoPrincipal">
+        <img class="det-foto-main" id="detFotoMain" src="" alt="Foto principal"/>
+        <div class="det-badge-wrap">
+          <span class="det-badge" id="detBadgeAR" style="display:none"></span>
+        </div>
+        <div class="det-combo-label" id="comboLabel"></div>
+        <button class="det-zoom-btn" id="btnZoomPrenda" aria-label="Ver imagen ampliada" title="Ampliar imagen">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        </button>
+      </div>
+      <div class="det-thumbs-row" id="detThumbs" style="display:none"></div>
+    </aside>
+
+    <!-- Panel derecho — Personalizador -->
+    <div class="det-info">
+
+      <div class="det-meta-row">
+        <span class="det-numero" id="detNumero">—</span>
+        <span class="det-flor" id="detFlor">—</span>
+      </div>
+
+      <h1 class="det-titulo" id="detTitulo">Cargando…</h1>
+      <p class="det-subtitulo-desc" id="detSubtitulo"></p>
+
+      <!-- PERSONALIZADOR -->
+      <div class="personalizador">
+        <p class="personalizador-titulo">✦ Personaliza tu prenda</p>
+<!-- Color del diseño (solo para diseños con variantes de estampa) -->
+<div id="bloqueColorDisenio" style="display:none">
+  <div class="det-selector-label">
+    Color del diseño
+    <span class="valor-activo" id="disenioNombreActivo"></span>
+  </div>
+  <div class="det-colores-fondo" id="detColoresDisenio"></div>
+  <div class="det-divider"></div>
+</div>
+        <!-- Color de fondo -->
+        <div id="bloqueColorFondo">
+          <div class="det-selector-label">
+            Color de fondo
+            <span class="valor-activo" id="fondoNombreActivo"></span>
+          </div>
+          <div class="det-colores-fondo" id="detColoresFondo"></div>
+        </div>
+
+        <div class="det-divider"></div>
+
+        <!-- Corte -->
+        <div class="det-selector-label">
+          Corte
+          <span class="valor-activo" id="corteNombreActivo">Regular</span>
+        </div>
+        <div class="det-cortes" id="detCortes">
+          <button class="det-corte-btn active" data-corte="clasico">
+            <span class="corte-icon corte-icon--clasico"></span>
+            Regular
+          </button>
+          <button class="det-corte-btn" data-corte="oversize">
+            <span class="corte-icon corte-icon--oversize"></span>
+            Oversize
+          </button>
+          <button class="det-corte-btn" data-corte="boxy">
+            <span class="corte-icon corte-icon--boxy"></span>
+            Boxy Fit
+          </button>
+        </div>
+        <p class="det-corte-desc" id="detCorteDesc">Silueta ajustada al cuerpo, caída natural y elegante. El corte atemporal que sienta bien a todos los tipos de figura.</p>
+      </div>
+
+      <!-- TALLAS -->
+      <div class="det-tallas-wrap">
+        <div class="det-tallas-header">
+          <div class="det-selector-label" style="margin-bottom:0">Talla</div>
+          <button class="det-guia-link" onclick="document.getElementById('guiaTalla').open = true">
+            Guía de tallas →
+          </button>
+        </div>
+        <div class="det-tallas" id="detTallas"></div>
+      </div>
+
+      <details class="det-guia-talla" id="guiaTalla">
+        <summary>
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Guía de tallas
+        </summary>
+        <div class="det-guia-tabla">
+          <table>
+            <thead><tr><th>Talla</th><th>Busto (cm)</th><th>Cintura (cm)</th><th>Cadera (cm)</th></tr></thead>
+            <tbody>
+              <tr><td>XS</td><td>80–84</td><td>62–66</td><td>88–92</td></tr>
+              <tr><td>S</td><td>84–88</td><td>66–70</td><td>92–96</td></tr>
+              <tr><td>M</td><td>88–92</td><td>70–74</td><td>96–100</td></tr>
+              <tr><td>L</td><td>92–96</td><td>74–78</td><td>100–104</td></tr>
+              <tr><td>XL</td><td>96–100</td><td>78–82</td><td>104–108</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <div class="det-divider"></div>
+
+      <!-- DESCRIPCIÓN -->
+      <div class="det-descripcion" id="detDescripcion"></div>
+
+      <!-- COMPOSICIÓN -->
+      <div class="det-spec-bloque">
+        <span class="det-spec-label">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+          Composición de tela
+        </span>
+        <div class="det-tela" id="detTela"></div>
+      </div>
+
+      <!-- CUIDADOS -->
+      <div class="det-spec-bloque">
+        <span class="det-spec-label">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Cuidados
+        </span>
+        <div class="det-cuidados" id="detCuidados"></div>
+      </div>
+
+      <div class="det-divider"></div>
+
+      <!-- CTAs -->
+      <div class="det-ctas" id="detCtas"></div>
+
+    </div><!-- /.det-info -->
+  </main>
+
+  <!-- VISOR 3D -->
+  <section class="det-3d-section" id="det3dSection" style="display:none">
+    <div class="det-3d-label">Modelo 3D interactivo</div>
+    <div class="det-3d-wrap" id="det3dWrap">
+      <div class="det-3d-fallback">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        <span>Modelo 3D no disponible para este diseño</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOTOS REALES -->
+  <section class="det-fotos-reales" id="detFotosReales" style="display:none">
+    <div class="det-fotos-reales-label">Fotografías de la prenda</div>
+    <div class="det-fotos-grid" id="detFotosGrid"></div>
+  </section>
+
+  <!-- LIGHTBOX DE PRENDA (foto principal ampliada) -->
+  <div class="lb-prenda-backdrop" id="lbPrendaBackdrop"></div>
+  <div class="lb-prenda" id="lbPrenda" role="dialog" aria-modal="true" aria-hidden="true">
+    <button class="lb-prenda-close" id="lbPrendaClose" aria-label="Cerrar">✕</button>
+    <div class="lb-prenda-main" id="lbPrendaMain">
+      <button class="lb-prenda-nav lb-prenda-prev" id="lbPrendaPrev" aria-label="Anterior">&#8249;</button>
+      <img class="lb-prenda-img" id="lbPrendaImg" src="" alt="Imagen ampliada de prenda"/>
+      <button class="lb-prenda-nav lb-prenda-next" id="lbPrendaNext" aria-label="Siguiente">&#8250;</button>
+      <div class="lb-prenda-counter" id="lbPrendaCounter">1 / 1</div>
+    </div>
+    <div class="lb-prenda-thumbs" id="lbPrendaThumbs"></div>
+  </div>
+
+  <!-- LIGHTBOX (fotos reales) -->  <div class="det-lightbox" id="detLightbox" role="dialog" aria-modal="true" aria-hidden="true">
+    <button class="det-lightbox-close" id="lbClose" aria-label="Cerrar">✕</button>
+    <button class="det-lightbox-nav det-lb-prev" id="lbPrev" aria-label="Anterior">&#8249;</button>
+    <button class="det-lightbox-nav det-lb-next" id="lbNext" aria-label="Siguiente">&#8250;</button>
+    <img class="det-lightbox-img" id="lbImg" src="" alt="Imagen ampliada"/>
+    <div class="det-lightbox-counter" id="lbCounter">1 / 1</div>
+  </div>
+  <div class="det-lightbox-backdrop" id="detLbBackdrop"></div>
+
+  <!-- DISEÑOS RELACIONADOS -->
+  <section class="det-relacionados">
+    <h2 class="det-rel-titulo">También te puede gustar</h2>
+    <div class="det-rel-grid" id="detRelGrid"></div>
+  </section>
+
+  <footer class="col-footer">
+    <p>&copy; 2026 LOOK LAB IVVI · <a href="index.html">Volver al inicio</a></p>
+  </footer>
+
+</div><!-- /#app -->
+
+<script src="src/scripts/navbar.js"></script>
+<script>
+/* ============================================================
+   DATOS — Catálogo de diseños con variantes por color/fondo
+   
+   Estructura de imágenes en assets/prendas/:
+   - {diseño}{color}-{corte}.png
+   - colores: b=blanco, n=negro, g=gris, r=rojo, nn=natural/nude
+   - cortes: reg=regular, over=oversize, boxy=boxy
+   
+   Preview principal: assets/mockups/...
+============================================================ */
+const DISENIOS = {
+1: {
+  numero: '01',
+  nombre: 'Rosa',
+  flor: 'Rosa',
+  florClass: 'rosa',
+  arLink: 'ar/ar-disenio1.html',
+  descripcion: `
+    <p>Delicadeza y carácter en cada costura. La <em>Colección Esencial</em> nace de la observación de los pétalos de la rosa: su textura suave pero firme, su color que oscila entre lo íntimo y lo apasionado.</p>
+    <p>Diseñamos cada prenda pensando en ese equilibrio entre elegancia discreta y presencia imponente.</p>
+  `,
+  tallas: ['XS', 'S', 'M', 'L', 'XL'],
+  tela: [{ label: '100%', materia: 'Algodón' }, { label: 'Gramaje', materia: '200 gr' }],
+  cuidados: ['Lavar a máquina 30°C', 'No usar secadora', 'Planchar a temperatura media', 'No lavar en seco'],
+  // coloresDisenio: los colores de la estampa/diseño
+coloresDisenio: [
+  { nombre: 'Negro / Blanco', hex: '#1C1A17', codigo: 'negro' },
+  { nombre: 'Rojo',           hex: '#C0292E', codigo: 'rojo'  },
+],
+coloresFondo: [
+  // ── Diseño Negro/Blanco ──
+  { nombre: 'Blanco', hex: '#F5F3EE', codigo: 'b', disenio: 'negro', preview: 'assets/prendas/rosa_D-negro_F-blanco_-over.png',
+    fotos: { clasico: 'assets/prendas/rosa_D-negro_F-blanco_-reg.png', oversize: 'assets/prendas/rosa_D-negro_F-blanco_-over.png', boxy: 'assets/prendas/rosa_D-negro_Fblanco_-boxy.png' } },
+  { nombre: 'Negro',  hex: '#1C1A17', codigo: 'n', disenio: 'negro', preview: 'assets/prendas/rosa_D-blanco_F-negro_-over.png',
+    fotos: { clasico: 'assets/prendas/rosa_D-blanco_F-negro_-reg.png', oversize: 'assets/prendas/rosa_D-blanco_F-negro_-over.png', boxy: 'assets/prendas/rosa_D-blanco_F-negro_-boxy.png' } },
+  // ── Diseño Rojo ──
+  { nombre: 'Blanco', hex: '#F5F3EE', codigo: 'b', disenio: 'rojo', preview: 'assets/prendas/rosa_D-rojo_Fblanco_-boxy.png',
+    fotos: { clasico: 'assets/prendas/rosa_D-rojo_Fblanco_-regular.png', oversize: 'assets/prendas/rosa_D-rojo_F-blanco_-over.png', boxy: 'assets/prendas/rosa_D-rojo_Fblanco_-boxy.png' } },
+  { nombre: 'Negro',  hex: '#1C1A17', codigo: 'n', disenio: 'rojo', preview: 'assets/prendas/rosa_D-rojo_F-negro_-boxy.png',
+    fotos: { clasico: 'assets/prendas/rosa_D-rojo_F-negro_-regular.png', oversize: 'assets/prendas/rosa_D-rojo_F-negro_-over.png', boxy: 'assets/prendas/rosa_D-rojo_F-negro_-boxy.png' } },
+],
+  modelo3d: { clasico: null, oversize: null, boxy: null },
+  fotosReales: [],
+  badge: 'AR',
+},
+  2: {
+    numero: '02',
+    nombre: 'Girasol',
+    subtitulo: 'Acentos en Amarillo',
+    flor: 'Girasol',
+    florClass: 'sol',
+    arLink: 'ar/ar-disenio2.html',
+    descripcion: `
+      <p>Luz y energía en cada detalle. La <em>Edición Moderna</em> captura la esencia del girasol: siempre orientada hacia la luz, en movimiento constante.</p>
+      <p>Líneas contemporáneas que dialogan con la naturaleza. Amarillo dorado que evoca nostalgia y sofisticación.</p>
+    `,
+    tallas: ['XS', 'S', 'M', 'L', 'XL'],
+    tela: [{ label: '60%', materia: 'Algodón orgánico' }, { label: '35%', materia: 'Modal' }, { label: '5%', materia: 'Elastano' }],
+    cuidados: ['Lavar a mano o a máquina 30°C', 'Secar en sombra', 'Planchar a temperatura baja', 'No blanquear'],
+    coloresFondo: [
+      { nombre: 'Negro', hex: '#1C1A17', codigo: 'n', preview: 'assets/mockups/girasolnegro.png',
+        fotos: { clasico: 'assets/prendas/girasoln-reg.png', oversize: 'assets/prendas/girasoln-over.png', boxy: 'assets/prendas/girasoln-boxy.png' } },
+      { nombre: 'Blanco', hex: '#F5F3EE', codigo: 'b', preview: 'assets/mockups/girasolblanco.png',
+        fotos: { clasico: 'assets/prendas/girasolb-reg.png', oversize: 'assets/prendas/girasolb-over.png', boxy: 'assets/prendas/girasolb-boxy.png' } },
+    ],
+   /* modelo3d: { clasico: 'assets/models/girasolFnegro.glb', oversize: null, boxy: null },*/
+    fotosReales: [],
+    badge: 'AR',
+  },
+  3: {
+    numero: '03',
+    nombre: 'Gloxinia',
+    subtitulo: 'Acentos en Morado',
+    flor: 'Gloxinia',
+    florClass: 'glox',
+    arLink: 'ar/ar-disenio3.html',
+    descripcion: `
+      <p>Misterio y sofisticación en degradado de morado. La <em>Elegancia Contemporánea</em> es para quienes no siguen las tendencias, las crean.</p>
+      <p>El morado vibrante de la Gloxinia se convierte en pigmento sobre la tela, creando una prenda que se siente viva.</p>
+    `,
+    tallas: ['XS', 'S', 'M', 'L', 'XL'],
+    tela: [{ label: '70%', materia: 'Viscosa de bambú' }, { label: '25%', materia: 'Poliamida' }, { label: '5%', materia: 'Elastano' }],
+    cuidados: ['Lavar a mano con agua fría', 'Secar plano', 'Planchar al revés a 120°C', 'No usar secadora'],
+    coloresFondo: [
+      { nombre: 'Blanco', hex: '#F5F3EE', codigo: 'b', preview: 'assets/mockups/gloxblanca.png',
+        fotos: { clasico: 'assets/prendas/glosb-reg.png', oversize: 'assets/prendas/gloxb-over.png', boxy: 'assets/prendas/gloxb-boxy.png' } },
+      { nombre: 'Negro',  hex: '#1C1A17', codigo: 'n', preview: 'assets/mockups/gloxnegra.png',
+        fotos: { clasico: 'assets/prendas/gloxn-reg.png', oversize: 'assets/prendas/gloxn-over.png', boxy: 'assets/prendas/gloxn-boxy.png' } },
+      { nombre: 'Gris',   hex: '#9B97A2', codigo: 'g', preview: 'assets/mockups/gloxblanca.png',
+        fotos: { clasico: 'assets/prendas/glosg-reg.png', oversize: 'assets/prendas/gloxg-over.png', boxy: 'assets/prendas/gloxg-boxy.png' } },
+    ],
+    /*modelo3d: { clasico: null, oversize: null, boxy: null },*/
+    fotosReales: [],
+    badge: 'Limited',
+  },
+  4: {
+    numero: '04',
+    nombre: 'Head in the Clouds',
+    flor: '',
+    florClass: 'rosa',
+    arLink: null,
+    descripcion: `<p>La intensidad del diseño en su expresión más oscura. <em>Head in the Clouds</em> está pensada para quienes brillan cuando cae el sol.</p>`,
+    tallas: ['S', 'M', 'L', 'XL'],
+    tela: [{ label: '100%', materia: 'Algodón' }, { label: 'Gramaje', materia: '200 gr' }],
+    cuidados: ['Solo lavar a mano', 'No centrifugar', 'Planchar a temperatura baja', 'Guardar en percha'],
+    coloresFondo: [
+      { nombre: 'Blanco', hex: '#F5F3EE', codigo: 'b', preview: 'assets/mockups/headblanco.png',
+        fotos: { clasico: 'assets/prendas/headb-reg.png', oversize: 'assets/prendas/headb-over.png', boxy: null } },
+      { nombre: 'Gris',   hex: '#B0ADA8', codigo: 'g', preview: 'assets/mockups/headgris.png',
+        fotos: { clasico: 'assets/prendas/headg-reg.png', oversize: 'assets/prendas/headg-over.png', boxy: 'assets/prendas/headg-boxy.png' } },
+      { nombre: 'Negro',  hex: '#1C1A17', codigo: 'n', preview: 'assets/mockups/headnegro.png',
+        fotos: { clasico: 'assets/prendas/headn-reg.png', oversize: 'assets/prendas/headn-over.png', boxy: 'assets/prendas/headn-boxy.png' } },
+    ],
+    /*modelo3d: { clasico: 'assets/models/headcloudsN.glb', oversize: null, boxy: null },*/
+    fotosReales: [],
+    badge: null,
+  },
+  7: {
+    numero: '05',
+    nombre: 'Fly to the Sky',
+    flor: '',
+    florClass: 'rosa',
+    arLink: null,
+    descripcion: `<p>Expresión artística en forma de prenda. La abstracción del diseño como lenguaje visual propio.</p>`,
+    tallas: ['XS', 'S', 'M', 'L', 'XL'],
+    tela: [{ label: '100%', materia: 'Algodón' }, { label: 'Gramaje', materia: '200 gr' }],
+    cuidados: ['Lavar a máquina 30°C', 'No usar secadora'],
+    coloresFondo: [
+      { nombre: 'Blanco', hex: '#F5F3EE', codigo: 'b', preview: 'assets/mockups/flyblanca.png',
+        fotos: { clasico: 'assets/prendas/flib-reg.png', oversize: 'assets/prendas/flyb-over.png', boxy: 'assets/prendas/flyb-boxy.png' } },
+      { nombre: 'Negro',  hex: '#1C1A17', codigo: 'n', preview: 'assets/mockups/flynegro.png',
+        fotos: { clasico: 'assets/prendas/flyn-reg.png', oversize: 'assets/prendas/flyn-over.png', boxy: 'assets/prendas/flyn-boxy.png' } },
+    ],
+    /*modelo3d: { clasico: 'assets/models/flyskyB.glb', oversize: null, boxy: null },*/
+    fotosReales: [],
+    badge: null,
+  },
+  9: {
+    numero: '06',
+    nombre: 'Ballena',
+    flor: '',
+    florClass: 'glox',
+    arLink: null,
+    descripcion: `<p>Una silueta icónica que define la identidad de LOOK LAB IVVI. El diseño de la ballena en su máxima expresión.</p>`,
+    tallas: ['XS', 'S', 'M', 'L'],
+    tela: [{ label: '100%', materia: 'Algodón' }, { label: 'Gramaje', materia: '200 gr' }],
+    cuidados: ['Lavar a mano', 'No planchar directamente'],
+    coloresFondo: [
+      { nombre: 'Blanco', hex: '#F5F3EE', codigo: 'b', preview: 'assets/mockups/ballenablanco.png',
+        fotos: { clasico: 'assets/prendas/bellenab-reg.png', oversize: 'assets/prendas/bellenab-over.png', boxy: 'assets/prendas/ballenab-boxy.png' } },
+      { nombre: 'Negro',  hex: '#1C1A17', codigo: 'n', preview: 'assets/mockups/ballenanegro.png',
+        fotos: { clasico: 'assets/prendas/ballenan-reg.png', oversize: 'assets/prendas/ballenan-over.png', boxy: 'assets/prendas/bellenan-boxy.png' } },
+    ],
+    /*modelo3d: { clasico: 'assets/models/ballenaB.glb', oversize: null, boxy: null },*/
+    fotosReales: [],
+    badge: 'AR',
+  },
+  11: {
+    numero: '07',
+    nombre: 'Keep Learning',
+    flor: '',
+    florClass: 'sol',
+    arLink: null,
+    descripcion: `<p>El conocimiento como actitud de vida. <em>Keep Learning</em> es para quienes nunca dejan de crecer.</p>`,
+    tallas: ['XS', 'S', 'M', 'L', 'XL'],
+    tela: [{ label: '100%', materia: 'Algodón' }, { label: 'Gramaje', materia: '200 gr' }],
+    cuidados: ['Lavar a máquina 30°C', 'Secar al aire', 'No usar secadora'],
+    coloresFondo: [
+      { nombre: 'Blanco', hex: '#F5F3EE', codigo: 'b', preview: 'assets/prendas/keepb-boxy.png',
+        fotos: { clasico: 'assets/prendas/keppb-reg.png', oversize: 'assets/prendas/keepb-over.png', boxy: 'assets/prendas/keepb-boxy.png' } },
+    ],
+    /*modelo3d: { clasico: 'assets/models/keeplearning.glb', oversize: null, boxy: null },*/
+    fotosReales: [],
+    badge: null,
+  },
+  12: {
+    numero: '08',
+    nombre: 'Walk',
+    flor: '',
+    florClass: '',
+    arLink: null,
+    descripcion: `<p>Movimiento y libertad en cada paso. Diseñada para quienes van a su propio ritmo.</p>`,
+    tallas: ['XS', 'S', 'M', 'L', 'XL'],
+    tela: [{ label: '100%', materia: 'Algodón' }, { label: 'Gramaje', materia: '200 gr' }],
+    cuidados: ['Lavar a máquina 30°C', 'No usar secadora'],
+    coloresFondo: [
+      { nombre: 'Blanco', hex: '#F5F3EE', codigo: 'b', preview: 'assets/prendas/walkb-boxy.png',
+        fotos: { clasico: 'assets/prendas/walkb-reg.png', oversize: 'assets/prendas/walkb-over.png', boxy: 'assets/prendas/walkb-boxy.png' } },
+      { nombre: 'Negro',  hex: '#1C1A17', codigo: 'n', preview: 'assets/prendas/walkn-boxy.png',
+        fotos: { clasico: 'assets/prendas/walkn-reg.png', oversize: 'assets/prendas/walkn-over.png', boxy: 'assets/prendas/walkn-boxy.png' } },
+    ],
+    modelo3d: { clasico: null, oversize: null, boxy: null },
+    fotosReales: [],
+    badge: null,
+  },
+  13: {
+    numero: '09',
+    nombre: 'GEAD',
+    flor: '',
+    florClass: '',
+    arLink: null,
+    descripcion: `<p>Identidad y carácter en un solo diseño. <em>GEAD</em> es expresión pura sin filtros.</p>`,
+    tallas: ['XS', 'S', 'M', 'L', 'XL'],
+    tela: [{ label: '100%', materia: 'Algodón' }, { label: 'Gramaje', materia: '200 gr' }],
+    cuidados: ['Lavar a máquina 30°C', 'Secar al aire'],
+    coloresFondo: [
+      { nombre: 'Blanco', hex: '#F5F3EE', codigo: 'b', preview: 'assets/prendas/geadb-boxy.png',
+        fotos: { clasico: null, oversize: null, boxy: 'assets/prendas/geadb-boxy.png' } },
+    ],
+    modelo3d: { clasico: null, oversize: null, boxy: null },
+    fotosReales: [],
+    badge: null,
+  },
+  14: {
+    numero: '10',
+    nombre: 'Rosa Roja',
+    flor: 'Rosa',
+    florClass: 'rosa',
+    arLink: null,
+    descripcion: `<p>La pasión del rojo en un diseño de rosas. Contundente, apasionada y con mucho carácter.</p>`,
+    tallas: ['XS', 'S', 'M', 'L', 'XL'],
+    tela: [{ label: '100%', materia: 'Algodón' }, { label: 'Gramaje', materia: '200 gr' }],
+    cuidados: ['Lavar a mano o a máquina 30°C', 'No usar secadora', 'Planchar a temperatura media'],
+    coloresFondo: [
+      { nombre: 'Rojo', hex: '#C0292E', codigo: 'r', preview: 'assets/prendas/rosar-boxy.png',
+        fotos: { clasico: 'assets/prendas/rosar-regular.png', oversize: 'assets/prendas/rossar-over.png', boxy: 'assets/prendas/rosar-boxy.png' } },
+      { nombre: 'Negro', hex: '#1C1A17', codigo: 'n', preview: 'assets/prendas/rosarn-boxy.png',
+        fotos: { clasico: null, oversize: 'assets/prendas/rosarn-over.png', boxy: 'assets/prendas/rosarn-boxy.png' } },
+    ],
+    modelo3d: { clasico: null, oversize: null, boxy: null },
+    fotosReales: [],
+    badge: null,
+  },
+};
+
+/* ── CORTE descripciones ── */
+const CORTE_DESC = {
+  clasico:  'Silueta ajustada al cuerpo, caída natural y elegante. El corte atemporal que sienta bien a todos los tipos de figura.',
+  oversize: 'Fit amplio y relajado con hombros caídos. Cómodo, urbano y con mucho carácter. Talla un número menos si prefieres menos amplitud.',
+  boxy:     'Cuerpo recto y cuadrado con largo corto. Moderno y versátil — ideal para llevar con pantalón de tiro alto o sobre otra prenda.',
+};
+
+const CORTE_NOMBRES = { clasico: 'Regular', oversize: 'Oversize', boxy: 'Boxy Fit' };
+
+/* ── ESTADO ── */
+let fondoActivo = 0;
+let corteActivo = 'clasico';
+let disenioActivo = 'negro'; // 'negro' | 'rojo' — solo para diseños con coloresDisenio
+let activeFotos = [];
+let currentFoto = 0;
+
+function getID() {
+  return parseInt(new URLSearchParams(window.location.search).get('id')) || 1;
+}
+
+/* ── INIT ── */
+function init() {
+  const id = getID();
+  const d = DISENIOS[id];
+  if (!d) {
+    document.getElementById('detMain').innerHTML = '<p style="padding:60px;text-align:center">Diseño no encontrado. <a href="coleccion.html">← Volver</a></p>';
+    return;
+  }
+
+  document.getElementById('breadNombre').textContent = d.nombre;
+  document.title = d.nombre + ' — LOOK LAB IVVI';
+  document.getElementById('detNumero').textContent = d.numero;
+  document.getElementById('detFlor').textContent = d.flor || '';
+  document.getElementById('detFlor').className = 'det-flor det-flor--' + (d.florClass || '');
+  document.getElementById('detTitulo').textContent = d.nombre;
+  document.getElementById('detSubtitulo').textContent = d.subtitulo || '';
+  document.getElementById('detDescripcion').innerHTML = d.descripcion;
+
+  // Badge
+  const badgeEl = document.getElementById('detBadgeAR');
+  if (d.badge) {
+    badgeEl.textContent = d.badge;
+    badgeEl.className = 'det-badge det-badge--' + (d.badge === 'AR' ? 'ar' : 'limited');
+    badgeEl.style.display = 'inline-block';
+  } else {
+    badgeEl.style.display = 'none';
+  }
+
+  // Tela
+  document.getElementById('detTela').innerHTML = d.tela.map(t =>
+    `<div class="det-tela-item"><span class="det-tela-pct">${t.label}</span><span class="det-tela-nombre">${t.materia}</span></div>`
+  ).join('');
+
+  // Cuidados
+  document.getElementById('detCuidados').innerHTML = d.cuidados.map(c =>
+    `<span class="det-cuidado-item">• ${c}</span>`
+  ).join('');
+
+  // Tallas
+  const tallasEl = document.getElementById('detTallas');
+  tallasEl.innerHTML = d.tallas.map(t =>
+    `<button class="det-talla" data-talla="${t}">${t}</button>`
+  ).join('');
+  tallasEl.querySelectorAll('.det-talla').forEach(btn => {
+    btn.addEventListener('click', () => {
+      tallasEl.querySelectorAll('.det-talla').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    });
+  });
+
+  // CTAs
+  let ctasHtml = `<a href="coleccion.html" class="btn-outline-grande">← Volver</a>`;
+  if (d.arLink) {
+    ctasHtml += `<a href="${d.arLink}" class="btn-primary-grande"><span class="det-ar-dot"></span>Activar RA</a>`;
+  } else {
+    ctasHtml += `<a href="https://wa.me/573000000000?text=Hola%20IVVI%2C%20quiero%20pedir%20${encodeURIComponent(d.nombre)}" target="_blank" class="btn-primary-grande">Pedir esta prenda</a>`;
+  }
+  document.getElementById('detCtas').innerHTML = ctasHtml;
+
+  // Fotos reales
+  if (d.fotosReales && d.fotosReales.length > 0) {
+    document.getElementById('detFotosReales').style.display = 'block';
+    document.getElementById('detFotosGrid').innerHTML = d.fotosReales.map((src, i) =>
+      `<div class="det-foto-real-item" data-idx="${i}"><img src="${src}" alt="Foto real ${i+1}" loading="lazy"/></div>`
+    ).join('');
+  }
+
+
+// Colores de diseño (estampa) — solo si aplica
+buildColoresDisenio(d);
+
+// Colores de fondo
+buildColoresFondo(d);
+  // Colores de fondo
+  buildColoresFondo(d);
+
+  // Cortes
+  buildCortes(d);
+
+  // Relacionados
+  buildRelacionados(id, d.florClass);
+
+  // Actualizar imagen inicial
+  actualizarImagen(d);
+}
+  /* ── COLORES DE DISEÑO (estampa) ── */
+function buildColoresDisenio(d) {
+  // Si el diseño no tiene coloresDisenio, ocultar el bloque
+  const bloque = document.getElementById('bloqueColorDisenio');
+  if (!d.coloresDisenio || d.coloresDisenio.length === 0) {
+    if (bloque) bloque.style.display = 'none';
+    return;
+  }
+  if (bloque) bloque.style.display = 'block';
+
+  const contenedor = document.getElementById('detColoresDisenio');
+  contenedor.innerHTML = '';
+  d.coloresDisenio.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'det-color-swatch' + (c.codigo === disenioActivo ? ' active' : '');
+    btn.style.background = c.hex;
+    if (isClaro(c.hex)) btn.style.outline = '1.5px solid #ccc';
+    btn.setAttribute('data-nombre', c.nombre);
+    btn.setAttribute('aria-label', 'Diseño ' + c.nombre);
+    btn.addEventListener('click', () => {
+      disenioActivo = c.codigo;
+      contenedor.querySelectorAll('.det-color-swatch').forEach((b, j) => b.classList.toggle('active', j === i));
+      document.getElementById('disenioNombreActivo').textContent = c.nombre;
+      // Resetear el fondo al primer color disponible para este diseño
+      fondoActivo = 0;
+      buildColoresFondo(d);
+      actualizarImagen(d);
+    });
+    contenedor.appendChild(btn);
+  });
+  document.getElementById('disenioNombreActivo').textContent = d.coloresDisenio.find(c => c.codigo === disenioActivo)?.nombre || d.coloresDisenio[0].nombre;
+}
+/* ── COLORES DE FONDO ── */
+function buildColoresFondo(d) {
+  const todosLosColores = d.coloresFondo || [];
+  // Si el diseño tiene variantes de color de estampa, filtrar por la activa
+  const colores = d.coloresDisenio
+    ? todosLosColores.filter(c => c.disenio === disenioActivo)
+    : todosLosColores;
+
+  const contenedor = document.getElementById('detColoresFondo');
+
+  // Solo leer el param de URL la primera vez (al init)
+  if (fondoActivo >= colores.length) fondoActivo = 0;
+
+  contenedor.innerHTML = '';
+  colores.forEach((c, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'det-color-swatch' + (i === fondoActivo ? ' active' : '');
+    btn.style.background = c.hex;
+    if (isClaro(c.hex)) btn.style.outline = '1.5px solid #ccc';
+    btn.setAttribute('data-nombre', c.nombre);
+    btn.setAttribute('aria-label', 'Fondo ' + c.nombre);
+    btn.addEventListener('click', () => {
+      fondoActivo = i;
+      contenedor.querySelectorAll('.det-color-swatch').forEach((b, j) => b.classList.toggle('active', j === i));
+      document.getElementById('fondoNombreActivo').textContent = c.nombre;
+      actualizarImagen(DISENIOS[getID()]);
+    });
+    contenedor.appendChild(btn);
+  });
+
+  if (colores[fondoActivo]) {
+    document.getElementById('fondoNombreActivo').textContent = colores[fondoActivo].nombre;
+  }
+}
+
+function isClaro(hex) {
+  if (!hex || hex.length < 7) return false;
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return (r*299 + g*587 + b*114)/1000 > 200;
+}
+
+/* ── CORTES ── */
+function buildCortes(d) {
+  const btns = document.querySelectorAll('.det-corte-btn');
+  const descEl = document.getElementById('detCorteDesc');
+
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      corteActivo = btn.dataset.corte;
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('corteNombreActivo').textContent = CORTE_NOMBRES[corteActivo];
+      descEl.style.opacity = '0';
+      setTimeout(() => {
+        descEl.textContent = CORTE_DESC[corteActivo] || '';
+        descEl.style.opacity = '1';
+      }, 120);
+      actualizarImagen(DISENIOS[getID()]);
+    });
+  });
+
+  descEl.textContent = CORTE_DESC['clasico'];
+  document.getElementById('corteNombreActivo').textContent = 'Regular';
+}
+
+/* ── ACTUALIZAR IMAGEN SEGÚN SELECCIÓN ── */
+function actualizarImagen(d) {
+  const todosLosColores = d.coloresFondo || [];
+  const colores = d.coloresDisenio
+    ? todosLosColores.filter(c => c.disenio === disenioActivo)
+    : todosLosColores;
+
+  const colorData = colores[fondoActivo];
+  if (!colorData) return;
+
+  const fotoCorte = colorData.fotos ? colorData.fotos[corteActivo] : null;
+  const foto = fotoCorte || colorData.preview;
+
+  const imgEl = document.getElementById('detFotoMain');
+  imgEl.classList.add('cambiando');
+  setTimeout(() => {
+    imgEl.src = foto || colorData.preview;
+    imgEl.classList.remove('cambiando');
+  }, 150);
+
+  const corteNombre = CORTE_NOMBRES[corteActivo];
+  const disenioLabel = d.coloresDisenio ? ` · Diseño ${disenioActivo}` : '';
+  document.getElementById('comboLabel').textContent = colorData.nombre + disenioLabel + ' · ' + corteNombre;
+
+  const modelo = d.modelo3d ? d.modelo3d[corteActivo] : null;
+  buildVisor3D(modelo, d);
+}
+
+/* ── VISOR 3D ── */
+function buildVisor3D(modelo, d) {
+  const section3d = document.getElementById('det3dSection');
+  const wrap3d = document.getElementById('det3dWrap');
+
+  const prevMV = wrap3d.querySelector('model-viewer');
+  if (prevMV) prevMV.remove();
+  wrap3d.classList.remove('sin-modelo');
+
+  if (modelo) {
+    section3d.style.display = 'block';
+    const mv = document.createElement('model-viewer');
+    mv.setAttribute('src', modelo);
+    mv.setAttribute('ar', '');
+    mv.setAttribute('ar-modes', 'webxr scene-viewer quick-look');
+    mv.setAttribute('camera-controls', '');
+    mv.setAttribute('shadow-intensity', '1');
+    mv.setAttribute('auto-rotate', '');
+    mv.setAttribute('touch-action', 'pan-y');
+    const arBtn = document.createElement('button');
+    arBtn.setAttribute('slot', 'ar-button');
+    arBtn.className = 'btn-ar-floating';
+    arBtn.textContent = '👋 Ver en tu espacio (AR)';
+    mv.appendChild(arBtn);
+    mv.addEventListener('error', () => { wrap3d.classList.add('sin-modelo'); });
+    wrap3d.prepend(mv);
+  } else {
+    section3d.style.display = 'none';
+  }
+}
+
+/* ── RELACIONADOS ── */
+function buildRelacionados(currentId, florClass) {
+  const grid = document.getElementById('detRelGrid');
+  const related = Object.entries(DISENIOS)
+    .filter(([id]) => parseInt(id) !== currentId)
+    .slice(0, 3);
+
+  grid.innerHTML = related.map(([id, d]) => {
+    const foto = d.coloresFondo && d.coloresFondo[0]
+      ? (d.coloresFondo[0].preview || d.coloresFondo[0].fotos.clasico)
+      : '';
+    return `<a href="detalle-disenio.html?id=${id}" class="det-rel-card">
+      <div class="det-rel-img">
+        <img src="${foto}" alt="${d.nombre}" onerror="this.style.display='none'"/>
+      </div>
+      <div class="det-rel-body">
+        <strong>${d.nombre}</strong>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+/* ── LIGHTBOX DE PRENDA ── */
+(function() {
+  const backdrop = document.getElementById('lbPrendaBackdrop');
+  const lb       = document.getElementById('lbPrenda');
+  const img      = document.getElementById('lbPrendaImg');
+  const counter  = document.getElementById('lbPrendaCounter');
+  const thumbsEl = document.getElementById('lbPrendaThumbs');
+  let fotos = [];
+  let current = 0;
+
+  function getAllFotos(d) {
+    // Reúne todas las imágenes disponibles del diseño activo
+    const todosLosColores = d.coloresFondo || [];
+    const colores = d.coloresDisenio
+      ? todosLosColores.filter(c => c.disenio === disenioActivo)
+      : todosLosColores;
+    const all = [];
+    const seen = new Set();
+    colores.forEach(c => {
+      const imgs = c.fotos ? Object.values(c.fotos) : [];
+      if (c.preview && !seen.has(c.preview)) { seen.add(c.preview); all.push({ src: c.preview, label: c.nombre }); }
+      imgs.forEach(src => { if (src && !seen.has(src)) { seen.add(src); all.push({ src, label: c.nombre }); } });
+    });
+    return all;
+  }
+
+  function buildThumbs() {
+    thumbsEl.innerHTML = '';
+    fotos.forEach((f, i) => {
+      const th = document.createElement('div');
+      th.className = 'lb-prenda-thumb' + (i === current ? ' active' : '');
+      th.innerHTML = `<img src="${f.src}" alt="${f.label}" loading="lazy"/>`;
+      th.addEventListener('click', () => goTo(i));
+      thumbsEl.appendChild(th);
+    });
+  }
+
+  function updateThumbs() {
+    thumbsEl.querySelectorAll('.lb-prenda-thumb').forEach((th, i) => th.classList.toggle('active', i === current));
+    // Scroll thumb into view
+    const active = thumbsEl.children[current];
+    if (active) active.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+  }
+
+  function goTo(idx) {
+    current = (idx + fotos.length) % fotos.length;
+    img.classList.add('cambiando');
+    setTimeout(() => {
+      img.src = fotos[current].src;
+      img.classList.remove('cambiando');
+    }, 140);
+    counter.textContent = (current + 1) + ' / ' + fotos.length;
+    updateThumbs();
+  }
+
+  function open(startIdx) {
+    const d = DISENIOS[getID()];
+    fotos = getAllFotos(d);
+    if (!fotos.length) return;
+    current = startIdx || 0;
+    img.src = fotos[current].src;
+    counter.textContent = (current + 1) + ' / ' + fotos.length;
+    buildThumbs();
+    lb.classList.add('visible');
+    backdrop.classList.add('visible');
+    lb.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function close() {
+    lb.classList.remove('visible');
+    backdrop.classList.remove('visible');
+    lb.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  // Abrir desde botón zoom o click en foto principal
+  document.getElementById('btnZoomPrenda').addEventListener('click', () => {
+    // Encontrar el índice de la foto actual
+    const d = DISENIOS[getID()];
+    const all = getAllFotos(d);
+    const currentSrc = document.getElementById('detFotoMain').src;
+    let idx = all.findIndex(f => currentSrc.includes(f.src) || f.src === currentSrc);
+    if (idx < 0) idx = 0;
+    open(idx);
+  });
+
+  document.getElementById('detFotoMain').style.cursor = 'zoom-in';
+  document.getElementById('detFotoMain').addEventListener('click', () => {
+    const d = DISENIOS[getID()];
+    const all = getAllFotos(d);
+    const currentSrc = document.getElementById('detFotoMain').src;
+    let idx = all.findIndex(f => currentSrc.includes(f.src) || f.src === currentSrc);
+    if (idx < 0) idx = 0;
+    open(idx);
+  });
+
+  document.getElementById('lbPrendaClose').addEventListener('click', close);
+  backdrop.addEventListener('click', close);
+  document.getElementById('lbPrendaPrev').addEventListener('click', () => goTo(current - 1));
+  document.getElementById('lbPrendaNext').addEventListener('click', () => goTo(current + 1));
+
+  document.addEventListener('keydown', e => {
+    if (!lb.classList.contains('visible')) return;
+    if (e.key === 'Escape')      close();
+    if (e.key === 'ArrowLeft')   goTo(current - 1);
+    if (e.key === 'ArrowRight')  goTo(current + 1);
+  });
+})();
+
+/* ── LIGHTBOX ── */
+const lightbox = document.getElementById('detLightbox');
+const lbBackdrop = document.getElementById('detLbBackdrop');
+const lbImg = document.getElementById('lbImg');
+const lbCounter = document.getElementById('lbCounter');
+
+function closeLightbox() {
+  lightbox.classList.remove('visible');
+  lbBackdrop.classList.remove('visible');
+  lightbox.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+}
+function lbNav(dir) {
+  const next = (currentFoto + dir + activeFotos.length) % activeFotos.length;
+  currentFoto = next;
+  lbImg.src = activeFotos[next];
+  lbCounter.textContent = (next + 1) + ' / ' + activeFotos.length;
+}
+
+document.getElementById('lbClose').addEventListener('click', closeLightbox);
+document.getElementById('lbPrev').addEventListener('click', () => lbNav(-1));
+document.getElementById('lbNext').addEventListener('click', () => lbNav(1));
+lbBackdrop.addEventListener('click', closeLightbox);
+document.addEventListener('keydown', e => {
+  if (lightbox.classList.contains('visible')) {
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') lbNav(-1);
+    if (e.key === 'ArrowRight') lbNav(1);
+  }
+});
+
+/* Foto real click */
+document.getElementById('detFotosGrid').addEventListener('click', e => {
+  const item = e.target.closest('.det-foto-real-item');
+  if (!item) return;
+  const id = getID();
+  const d = DISENIOS[id];
+  activeFotos = d.fotosReales;
+  currentFoto = parseInt(item.dataset.idx);
+  lbImg.src = activeFotos[currentFoto];
+  lbCounter.textContent = (currentFoto + 1) + ' / ' + activeFotos.length;
+  lightbox.classList.add('visible');
+  lbBackdrop.classList.add('visible');
+  lightbox.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+});
+
+/* ── NAVBAR ── */
+const nav = document.getElementById('mainNav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 10));
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

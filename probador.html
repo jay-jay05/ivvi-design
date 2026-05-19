@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Probador Virtual – LOOK LAB IVVI</title>
+
+  <!-- IA + Canvas -->
+  <script src="https://unpkg.com/ml5@1/dist/ml5.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5@2.1.1/lib/p5.min.js"></script>
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="src/styles/main.css" />
+  <link rel="stylesheet" href="src/styles/navbar.css" />
+  <link rel="stylesheet" href="src/styles/probador.css" />
+</head>
+<body>
+<div id="app">
+
+  <!-- ══════════════════════════════════════
+       NAVBAR
+  ═══════════════════════════════════════ -->
+  <nav class="navbar" id="mainNav">
+    <a href="index.html">
+      <div class="brand-container">
+        <img src="src/assets/images/logo.png" class="brand-logo" alt="Logo">
+        <span class="brand-name">LOOK LAB IVVI</span>
+      </div>
+    </a>
+    <button class="navbar-toggle" id="navToggle"
+      aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="navbar-links" id="navLinks">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="coleccion.html">Colección</a></li>
+      <li><a href="disenios-ra.html">Diseños RA <span class="badge-ar">AR</span></a></li>
+      <li><a href="probador.html" class="active">Probador Virtual</a></li>
+    </ul>
+  </nav>
+
+  <!-- ══════════════════════════════════════
+       PÁGINA PRINCIPAL
+  ═══════════════════════════════════════ -->
+  <main class="probador-page">
+
+    <!-- ── Cabecera ── -->
+    <div class="probador-header">
+      <span class="label">Tecnología IA · Tiempo real</span>
+      <h1>Probador Virtual</h1>
+      <p>Selecciona una prenda de la colección y mírala sobre ti usando tu cámara.</p>
+
+      <!-- Micro-copy: guía silenciosa -->
+      <div class="probador-microcopy">
+        <span>
+          <!-- Escudo privacidad -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          Tu cámara no se graba ni se almacena
+        </span>
+        <span data-tip="Necesitas Chrome o Firefox actualizado en escritorio o Android">
+          <!-- Info -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          Compatible con Chrome y Firefox
+        </span>
+      </div>
+    </div>
+
+    <!-- ── Layout probador ── -->
+    <div class="probador-layout">
+
+      <!-- Panel lateral de prendas -->
+      <aside class="prendas-panel">
+        <p class="prendas-panel__titulo">Colección</p>
+
+        <!-- Rosa -->
+        <div class="prenda-card" id="card-1" onclick="onPrendaClick('Diseño 1')">
+          <div class="prenda-card__img-wrap prenda-card__img-wrap--rosa">
+            <img src="src/assets/images/gssf.png" alt="Rosa"
+              onerror="this.src='';this.parentElement.classList.add('placeholder')" />
+          </div>
+          <div class="prenda-card__info">
+            <span class="prenda-card__nombre">Rosa</span>
+            <span class="prenda-card__dot prenda-card__dot--rosa"></span>
+          </div>
+        </div>
+
+        <!-- Girasol -->
+        <div class="prenda-card" id="card-2" onclick="onPrendaClick('Diseño 2')">
+          <div class="prenda-card__img-wrap prenda-card__img-wrap--sol">
+            <img src="src/assets/images/fotocamisa2.png" alt="Girasol"
+              onerror="this.src='';this.parentElement.classList.add('placeholder')" />
+          </div>
+          <div class="prenda-card__info">
+            <span class="prenda-card__nombre">Girasol</span>
+            <span class="prenda-card__dot prenda-card__dot--sol"></span>
+          </div>
+        </div>
+
+        <!-- Gloxinia -->
+        <div class="prenda-card" id="card-3" onclick="onPrendaClick('Diseño 3')">
+          <div class="prenda-card__img-wrap prenda-card__img-wrap--glox">
+            <img src="src/assets/images/fotocamisa3.png" alt="Gloxinia"
+              onerror="this.src='';this.parentElement.classList.add('placeholder')" />
+          </div>
+          <div class="prenda-card__info">
+            <span class="prenda-card__nombre">Gloxinia</span>
+            <span class="prenda-card__dot prenda-card__dot--glox"></span>
+          </div>
+        </div>
+
+        <!-- Quitar prenda -->
+        <button class="btn-quitar" onclick="onPrendaClick(null)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+          Quitar prenda
+        </button>
+
+        <!-- Estado activo -->
+        <div class="estado-panel" id="estadoPanel">
+          <div class="estado-panel__dot" id="estadoDot"></div>
+          <p id="estadoTexto">Sin prenda seleccionada</p>
+        </div>
+
+        <!-- Link directo a Diseños RA -->
+        <a href="disenios-ra.html" class="panel-ra-link">
+          Ver experiencia AR
+          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </a>
+      </aside>
+
+      <!-- Canvas de cámara + IA -->
+      <div class="probador-canvas-wrapper">
+        <div id="probadorCanvas"></div>
+
+        <!-- Loader -->
+        <div class="probador-loader" id="probadorLoader">
+          <div class="loader-ring">
+            <div class="loader-spinner"></div>
+          </div>
+          <p class="loader-titulo">Cargando modelo de IA</p>
+          <p class="loader-sub">Esto solo tarda unos segundos…</p>
+        </div>
+
+        <!-- Hint cuando no hay prenda seleccionada -->
+        <div class="canvas-hint" id="canvasHint">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <span>Elige una prenda del panel</span>
+        </div>
+      </div>
+
+    </div><!-- /.probador-layout -->
+
+    <!-- ── Instrucciones ── -->
+    <section class="instrucciones" id="instrucciones">
+      <h2>¿Cómo usar el Probador?</h2>
+      <ol>
+        <li>
+          <div class="instruc-body">
+            <strong>Activa la cámara</strong>
+            <span>Acepta el permiso cuando el navegador lo solicite.</span>
+          </div>
+        </li>
+        <li>
+          <div class="instruc-body">
+            <strong>Espera la IA</strong>
+            <span>El modelo tarda unos segundos en cargar la primera vez.</span>
+          </div>
+        </li>
+        <li>
+          <div class="instruc-body">
+            <strong>Posiciónate</strong>
+            <span>Colócate frente a la cámara con los hombros bien visibles.</span>
+          </div>
+        </li>
+        <li>
+          <div class="instruc-body">
+            <strong>Elige y prueba</strong>
+            <span>Selecciona Rosa, Girasol o Gloxinia y véla sobre ti.</span>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ── Banner → Diseños RA ── -->
+    <div class="probador-ra-banner">
+      <div class="ra-banner-content">
+        <span class="ra-banner-label">¿Quieres más?</span>
+        <p>
+          Prueba la experiencia de <strong>Realidad Aumentada</strong> completa:
+          imprime el diseño y vélo cobrar vida con tu cámara.
+        </p>
+        <a href="disenios-ra.html" class="btn-primary">Explorar Diseños RA →</a>
+      </div>
+    </div>
+
+  </main>
+</div><!-- /#app -->
+
+<!-- Scripts -->
+<script src="src/scripts/navbar.js"></script>
+<script src="src/scripts/probadorSketch.js"></script>
+<script>
+  /* Iniciar p5 en modo instancia */
+  new p5(function (sketch) {
+    window._p5 = sketch;
+    sketch.setup         = setup;
+    sketch.draw          = draw;
+    sketch.windowResized = windowResized;
+  });
+
+  /* Sombra en navbar al hacer scroll */
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () =>
+    nav.classList.toggle('scrolled', window.scrollY > 10)
+  );
+
+  /* Mostrar / ocultar canvas-hint */
+  const canvasHint = document.getElementById('canvasHint');
+  document.querySelectorAll('.prenda-card').forEach(card => {
+    card.addEventListener('click', () =>
+      canvasHint && canvasHint.classList.add('hidden')
+    );
+  });
+  document.querySelector('.btn-quitar').addEventListener('click', () =>
+    canvasHint && canvasHint.classList.remove('hidden')
+  );
+
+  /* Marcar prenda seleccionada visualmente */
+  const originalOnPrendaClick = window.onPrendaClick;
+  document.querySelectorAll('.prenda-card').forEach((card, i) => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.prenda-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      const dot = document.getElementById('estadoDot');
+      if (dot) dot.classList.add('activo');
+    });
+  });
+  document.querySelector('.btn-quitar').addEventListener('click', () => {
+    document.querySelectorAll('.prenda-card').forEach(c => c.classList.remove('selected'));
+    const dot = document.getElementById('estadoDot');
+    if (dot) dot.classList.remove('activo');
+  });
+</script>
+</body>
+</html>

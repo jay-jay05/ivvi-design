@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Realidad Aumentada · IVVI</title>
+
+  <!-- MindAR + A-Frame -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Archivo:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Reset & tokens ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold:   #E8A020;
+      --gold-lt:#F5C76A;
+      --ink:    #1A1208;
+      --cream:  #FBF7F0;
+      --gray:   #6B6050;
+      --radius: 12px;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      font-family: 'Archivo', sans-serif;
+      background: var(--ink);
+      color: var(--cream);
+      overflow-x: hidden;
+    }
+
+    /* ── Hero / intro ── */
+    .hero {
+      position: relative;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px 40px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 55% at 50% 0%, rgba(232,160,32,.18) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 80% 90%, rgba(232,160,32,.10) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(232,160,32,.35);
+      border-radius: 100px;
+      padding: 6px 18px;
+      font-size: .72rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--gold-lt);
+      margin-bottom: 28px;
+      backdrop-filter: blur(6px);
+    }
+    .hero-badge span { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: pulse 2s ease-in-out infinite; }
+
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(2.6rem, 8vw, 5.2rem);
+      line-height: 1.08;
+      letter-spacing: -.01em;
+      color: var(--cream);
+      margin-bottom: 20px;
+    }
+    .hero h1 em { color: var(--gold); font-style: italic; }
+
+    .hero p {
+      max-width: 480px;
+      font-size: .95rem;
+      line-height: 1.7;
+      color: rgba(251,247,240,.65);
+      margin-bottom: 48px;
+    }
+
+    /* ── Instruction steps ── */
+    .steps {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 52px;
+    }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(232,160,32,.15);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      max-width: 200px;
+      text-align: left;
+    }
+    .step-num {
+      width: 26px; height: 26px; flex-shrink: 0;
+      border-radius: 50%;
+      border: 1px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem;
+      color: var(--gold);
+      font-weight: 500;
+    }
+    .step p { font-size: .8rem; line-height: 1.5; color: rgba(251,247,240,.7); }
+
+    /* ── Marker grid ── */
+    .markers-section {
+      padding: 0 24px 80px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: .7rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 32px;
+    }
+
+    .markers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .marker-card {
+      position: relative;
+      border: 1px solid rgba(232,160,32,.2);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color .3s, transform .3s;
+      background: rgba(255,255,255,.03);
+    }
+    .marker-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-4px);
+    }
+
+    .marker-card img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: contain;
+      padding: 20px;
+      background: #fff;
+      display: block;
+    }
+
+    .marker-card .card-info {
+      padding: 14px 16px;
+    }
+    .marker-card .card-info h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: 1.05rem;
+      color: var(--cream);
+      margin-bottom: 4px;
+    }
+    .marker-card .card-info p {
+      font-size: .73rem;
+      color: var(--gray);
+    }
+
+    .marker-card .target-badge {
+      position: absolute;
+      top: 10px; left: 10px;
+      background: rgba(232,160,32,.9);
+      color: var(--ink);
+      font-size: .63rem;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 100px;
+      letter-spacing: .08em;
+    }
+
+    /* ── CTA button ── */
+    .cta-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 80px;
+    }
+
+    .btn-ar {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--gold);
+      color: var(--ink);
+      font-family: 'Archivo', sans-serif;
+      font-weight: 500;
+      font-size: .9rem;
+      letter-spacing: .04em;
+      padding: 16px 36px;
+      border-radius: 100px;
+      border: none;
+      cursor: pointer;
+      transition: background .25s, transform .2s, box-shadow .25s;
+      box-shadow: 0 0 0 0 rgba(232,160,32,0);
+    }
+    .btn-ar:hover {
+      background: var(--gold-lt);
+      transform: scale(1.04);
+      box-shadow: 0 8px 40px rgba(232,160,32,.35);
+    }
+    .btn-ar svg { width: 20px; height: 20px; }
+
+    /* ── AR overlay ── */
+    #ar-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      z-index: 9999;
+      background: #000;
+    }
+
+    #ar-overlay.active { display: block; }
+
+    /* MindAR scene fills the overlay */
+    #ar-overlay a-scene {
+      position: absolute; inset: 0;
+    }
+
+    /* Top bar over the camera */
+    .ar-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      z-index: 10001;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(to bottom, rgba(0,0,0,.65) 0%, transparent 100%);
+    }
+
+    .ar-bar .brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      color: #fff;
+      letter-spacing: .1em;
+    }
+
+    .ar-close {
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      color: #fff;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      backdrop-filter: blur(8px);
+      transition: background .2s;
+    }
+    .ar-close:hover { background: rgba(255,255,255,.28); }
+
+    /* Scanning hint */
+    .ar-hint {
+      position: absolute;
+      bottom: 36px; left: 50%; transform: translateX(-50%);
+      z-index: 10001;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(232,160,32,.3);
+      border-radius: 100px;
+      padding: 10px 24px;
+      color: rgba(255,255,255,.85);
+      font-size: .8rem;
+      letter-spacing: .06em;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* Scan frame animation */
+    .scan-frame {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(280px, 75vw);
+      height: min(280px, 75vw);
+      z-index: 10000;
+      pointer-events: none;
+    }
+    .scan-frame::before, .scan-frame::after,
+    .scan-frame .c3, .scan-frame .c4 {
+      content: '';
+      position: absolute;
+      width: 32px; height: 32px;
+      border-color: var(--gold);
+      border-style: solid;
+    }
+    .scan-frame::before  { top:0;    left:0;  border-width: 2px 0 0 2px; }
+    .scan-frame::after   { top:0;    right:0; border-width: 2px 2px 0 0; }
+    .scan-frame .c3      { bottom:0; left:0;  border-width: 0 0 2px 2px; }
+    .scan-frame .c4      { bottom:0; right:0; border-width: 0 2px 2px 0; }
+
+    @keyframes scanline {
+      0%   { top: 0; opacity: 1; }
+      90%  { top: calc(100% - 2px); opacity: 1; }
+      100% { top: calc(100% - 2px); opacity: 0; }
+    }
+    .scan-line {
+      position: absolute;
+      left: 4px; right: 4px;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      animation: scanline 2.2s ease-in-out infinite;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .steps { flex-direction: column; align-items: center; }
+      .step  { max-width: 100%; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     SECCIÓN HERO
+════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-badge"><span></span>Realidad Aumentada</div>
+  <h1>Tus diseños<br/><em>cobran vida</em></h1>
+  <p>Apunta la cámara a cualquiera de los marcadores impresos o en pantalla y mira el diseño en 3D emerger ante tus ojos.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <p>Imprime o muestra el marcador de tu diseño favorito</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <p>Abre la cámara AR tocando el botón de abajo</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <p>Apunta al marcador y el modelo 3D aparece al instante</p>
+    </div>
+  </div>
+
+  <button class="btn-ar" onclick="openAR()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/>
+      <rect x="7" y="7" width="10" height="10" rx="1"/>
+    </svg>
+    Abrir cámara AR
+  </button>
+</section>
+
+<!-- ════════════════════════════════════════════
+     GRID DE MARCADORES
+════════════════════════════════════════════ -->
+<section class="markers-section">
+  <p class="section-label">Marcadores disponibles — apúntale la cámara</p>
+
+  <div class="markers-grid" id="markersGrid">
+    <!-- Las tarjetas se generan desde DISEÑOS en el JS -->
+  </div>
+</section>
+
+<div class="cta-wrap">
+  <button class="btn-ar" onclick="openAR()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/>
+      <rect x="7" y="7" width="10" height="10" rx="1"/>
+    </svg>
+    Abrir cámara AR
+  </button>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     OVERLAY AR (se activa al abrir cámara)
+════════════════════════════════════════════ -->
+<div id="ar-overlay">
+
+  <!-- Barra superior -->
+  <div class="ar-bar">
+    <span class="brand">IVVI</span>
+    <button class="ar-close" onclick="closeAR()">✕</button>
+  </div>
+
+  <!-- Marco de escaneo (visible antes de detectar) -->
+  <div class="scan-frame" id="scanFrame">
+    <div class="c3"></div>
+    <div class="c4"></div>
+    <div class="scan-line"></div>
+  </div>
+
+  <!-- Hint inferior -->
+  <div class="ar-hint" id="arHint">Apunta al marcador de cualquier diseño</div>
+
+  <!-- ══ ESCENA A-FRAME / MINDAR ══
+       El archivo targets.mind debe contener TODAS las imágenes compiladas juntas.
+       Cada <a-entity mindar-image-target="targetIndex: N"> corresponde
+       al índice de la imagen en el .mind (orden en que las subiste al trainer).
+  -->
+  <a-scene
+    id="arScene"
+    mindar-image="
+      imageTargetSrc: targets/targets.mind;
+      autoStart: false;
+      uiLoading: no;
+      uiScanning: no;
+      uiError: no;
+      filterMinCF: 0.001;
+      filterBeta: 0.01;
+      warmupTolerance: 5;
+      missTolerance: 5
+    "
+    color-space="sRGB"
+    renderer="colorManagement: true; physicallyCorrectLights: true"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+  >
+
+    <a-assets>
+      <!-- ▼▼▼ AGREGA AQUÍ TUS MODELOS GLB ▼▼▼ -->
+      <a-asset-item id="model-girasol"  src="models/girasol.glb"></a-asset-item>
+      <a-asset-item id="model-diseño2"  src="models/diseño2.glb"></a-asset-item>
+      <a-asset-item id="model-diseño3"  src="models/diseño3.glb"></a-asset-item>
+      <!-- ▲▲▲ fin modelos ▲▲▲ -->
+
+      <!-- Luz ambiente suave -->
+      <a-light type="ambient" color="#ffffff" intensity="0.6"></a-light>
+      <a-light type="directional" color="#fff5e0" intensity="0.9" position="1 2 2"></a-light>
+    </a-assets>
+
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    <!-- ── Target 0: Girasol ── -->
+    <a-entity mindar-image-target="targetIndex: 0"
+              id="target-0"
+              visible="false">
+      <a-gltf-model
+        src="#model-girasol"
+        position="0 0 0"
+        rotation="0 0 0"
+        scale="0.08 0.08 0.08"
+        animation__appear="
+          property: scale;
+          from: 0 0 0;
+          to: 0.08 0.08 0.08;
+          dur: 500;
+          easing: easeOutElastic;
+          startEvents: targetFound
+        "
+        animation__float="
+          property: position;
+          from: 0 0 0;
+          to: 0 0.015 0;
+          dur: 2200;
+          easing: easeInOutSine;
+          loop: true;
+          dir: alternate
+        "
+        animation__rotate="
+          property: rotation;
+          from: -5 0 -3;
+          to:  5 8 3;
+          dur: 4000;
+          easing: easeInOutSine;
+          loop: true;
+          dir: alternate
+        "
+      ></a-gltf-model>
+    </a-entity>
+
+    <!-- ── Target 1: Diseño 2 ── -->
+    <a-entity mindar-image-target="targetIndex: 1"
+              id="target-1"
+              visible="false">
+      <a-gltf-model
+        src="#model-diseño2"
+        position="0 0 0"
+        rotation="0 0 0"
+        scale="0.08 0.08 0.08"
+        animation__appear="
+          property: scale;
+          from: 0 0 0;
+          to: 0.08 0.08 0.08;
+          dur: 500;
+          easing: easeOutElastic;
+          startEvents: targetFound
+        "
+        animation__float="
+          property: position;
+          from: 0 0 0;
+          to: 0 0.015 0;
+          dur: 2400;
+          easing: easeInOutSine;
+          loop: true;
+          dir: alternate
+        "
+        animation__rotate="
+          property: rotation;
+          from: -4 0 -2;
+          to:  4 6 2;
+          dur: 4200;
+          easing: easeInOutSine;
+          loop: true;
+          dir: alternate
+        "
+      ></a-gltf-model>
+    </a-entity>
+
+    <!-- ── Target 2: Diseño 3 ── -->
+    <a-entity mindar-image-target="targetIndex: 2"
+              id="target-2"
+              visible="false">
+      <a-gltf-model
+        src="#model-diseño3"
+        position="0 0 0"
+        rotation="0 0 0"
+        scale="0.08 0.08 0.08"
+        animation__appear="
+          property: scale;
+          from: 0 0 0;
+          to: 0.08 0.08 0.08;
+          dur: 500;
+          easing: easeOutElastic;
+          startEvents: targetFound
+        "
+        animation__float="
+          property: position;
+          from: 0 0 0;
+          to: 0 0.015 0;
+          dur: 2000;
+          easing: easeInOutSine;
+          loop: true;
+          dir: alternate
+        "
+        animation__rotate="
+          property: rotation;
+          from: -6 0 -4;
+          to:  6 10 4;
+          dur: 3800;
+          easing: easeInOutSine;
+          loop: true;
+          dir: alternate
+        "
+      ></a-gltf-model>
+    </a-entity>
+
+    <!--
+    ╔═══════════════════════════════════════════════════╗
+    ║  PARA AGREGAR MÁS DISEÑOS:                        ║
+    ║  1. Añade el .glb en <a-assets>                   ║
+    ║  2. Copia un bloque <a-entity> y cambia:          ║
+    ║     · targetIndex al siguiente número             ║
+    ║     · src="#model-TUNUEVO"                        ║
+    ║  3. Agrega la imagen al array DISEÑOS en el JS    ║
+    ║  4. Recompila targets.mind con la nueva imagen    ║
+    ╚═══════════════════════════════════════════════════╝
+    -->
+
+  </a-scene>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════ -->
+<script>
+/* ══════════════════════════════════════════════
+   ▼▼▼  CONFIGURACIÓN — edita solo esto ▼▼▼
+   Agrega un objeto por cada diseño.
+   El índice del array (0,1,2…) debe coincidir
+   con el targetIndex en la escena A-Frame y con
+   el orden en que subiste las imágenes al trainer.
+══════════════════════════════════════════════ */
+const DISEÑOS = [
+  {
+    nombre:      'Girasol',
+    descripcion: 'Colección Flores Silvestres',
+    marker:      'markers/girasol_blanco_adelante.png',
+  },
+  {
+    nombre:      'Diseño 2',
+    descripcion: 'Nombre de tu colección',
+    marker:      'markers/diseño2.png',
+  },
+  {
+    nombre:      'Diseño 3',
+    descripcion: 'Nombre de tu colección',
+    marker:      'markers/diseño3.png',
+  },
+  // ← Agrega más aquí siguiendo el mismo formato
+];
+/* ▲▲▲  FIN CONFIGURACIÓN  ▲▲▲ */
+
+
+/* ── Generar tarjetas de marcadores ── */
+const grid = document.getElementById('markersGrid');
+DISEÑOS.forEach((d, i) => {
+  grid.innerHTML += `
+    <div class="marker-card">
+      <span class="target-badge">Marcador ${i + 1}</span>
+      <img src="${d.marker}" alt="Marcador ${d.nombre}" loading="lazy" />
+      <div class="card-info">
+        <h3>${d.nombre}</h3>
+        <p>${d.descripcion}</p>
+      </div>
+    </div>`;
+});
+
+/* ── Control del overlay AR ── */
+let sceneStarted = false;
+
+function openAR() {
+  const overlay = document.getElementById('ar-overlay');
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+
+  if (!sceneStarted) {
+    const scene = document.getElementById('arScene');
+    scene.addEventListener('loaded', () => {
+      scene.systems['mindar-image-system'].start();
+      sceneStarted = true;
+    }, { once: true });
+
+    // Si la escena ya estaba cargada
+    if (scene.hasLoaded) {
+      scene.systems['mindar-image-system'].start();
+      sceneStarted = true;
+    }
+  } else {
+    document.getElementById('arScene').systems['mindar-image-system'].start();
+  }
+
+  setupTargetEvents();
+}
+
+function closeAR() {
+  const overlay = document.getElementById('ar-overlay');
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+
+  try {
+    document.getElementById('arScene').systems['mindar-image-system'].stop();
+  } catch(e) {}
+
+  document.getElementById('scanFrame').style.display = '';
+  document.getElementById('arHint').textContent = 'Apunta al marcador de cualquier diseño';
+}
+
+/* Ocultar marco de escaneo cuando se detecta un target */
+function setupTargetEvents() {
+  DISEÑOS.forEach((_, i) => {
+    const entity = document.getElementById(`target-${i}`);
+    if (!entity) return;
+
+    entity.addEventListener('targetFound', () => {
+      document.getElementById('scanFrame').style.display = 'none';
+      document.getElementById('arHint').textContent =
+        `✦ ${DISEÑOS[i].nombre} detectado`;
+    });
+
+    entity.addEventListener('targetLost', () => {
+      const anyVisible = DISEÑOS.some((_, j) => {
+        const e = document.getElementById(`target-${j}`);
+        return e && e.getAttribute('visible') === true;
+      });
+      if (!anyVisible) {
+        document.getElementById('scanFrame').style.display = '';
+        document.getElementById('arHint').textContent =
+          'Apunta al marcador de cualquier diseño';
+      }
+    });
+  });
+}
+
+/* Cerrar con tecla Escape en desktop */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeAR();
+});
+</script>
+
+</body>
+</html>

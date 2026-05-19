@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LOOK LAB IVVI — Nueva Colección 2026</title>
+  <link rel="stylesheet" href="src/styles/main.css"/>
+  <link rel="stylesheet" href="src/styles/navbar.css"/>
+  <link rel="icon" type="image/png" href="src/assets/images/faviiicon.png">
+
+  <style>
+    /* ════════════════════════════════════════════════
+       INDEX — Inspirado en Milfshakes + Chill Colombia
+       Prendas al frente, variantes de color visibles,
+       grid editorial limpio y directo
+    ════════════════════════════════════════════════ */
+
+    * { box-sizing: border-box; }
+
+    /* ══ ANNOUNCEMENT BAR ══ */
+    .announce-bar {
+      background: var(--carbon);
+      color: rgba(250,249,246,.75);
+      font-family: var(--font-body);
+      font-size: 10px; letter-spacing: .14em; text-transform: uppercase;
+      text-align: center; padding: 9px 16px;
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 200;
+    }
+    .announce-bar span { color: var(--purple-xlight); }
+    #app { padding-top: calc(62px + 34px); }
+
+    /* ══ HERO — SPLIT EDITORIAL ══
+       Inspirado en Chill Colombia: imagen grande izquierda,
+       texto y prendas a la derecha
+    */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 92vh;
+      background: var(--cream);
+      overflow: hidden;
+    }
+
+    /* Lado izquierdo — imagen heroína grande */
+    .hero-img-side {
+      position: relative;
+      background: #EDEAE3;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .hero-img-side img {
+      width: 100%; height: 100%;
+      object-fit: contain;
+      padding: 8% 12% 4%;
+      transition: transform .7s cubic-bezier(.25,.46,.45,.94);
+    }
+    .hero-img-side:hover img { transform: scale(1.03); }
+
+    /* Pill de colección */
+    .hero-col-pill {
+      position: absolute; top: 20px; left: 20px;
+      background: rgba(250,249,246,.9); backdrop-filter: blur(8px);
+      border: 1px solid rgba(28,26,23,.08);
+      font-family: var(--font-body);
+      font-size: 9px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--carbon); padding: 6px 14px; border-radius: 20px;
+    }
+
+    /* Swatches de color sobre la imagen — estilo Chill Colombia */
+    .hero-swatches {
+      position: absolute; bottom: 20px; left: 20px;
+      display: flex; gap: 6px; align-items: center;
+    }
+    .hero-swatch {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.6);
+      cursor: pointer;
+      transition: transform .15s, border-color .15s;
+    }
+    .hero-swatch:hover,
+    .hero-swatch.active { border-color: var(--carbon); transform: scale(1.2); }
+
+    /* Lado derecho — copy + grid mini de prendas */
+    .hero-copy-side {
+      display: flex; flex-direction: column;
+      justify-content: center;
+      padding: clamp(32px, 5vw, 72px) clamp(24px, 5vw, 64px);
+      border-left: 1px solid var(--cream-mid);
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-body);
+      font-size: 9px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--purple); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .hero-eyebrow::before {
+      content: ''; display: inline-block;
+      width: 24px; height: 1px; background: var(--purple);
+    }
+
+    .hero-titulo {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 4.5vw, 4rem);
+      font-weight: 300; color: var(--carbon);
+      line-height: 1.0; letter-spacing: -.02em;
+      margin-bottom: 18px;
+    }
+    .hero-titulo em { color: var(--purple); font-style: italic; }
+
+    .hero-desc {
+      font-family: var(--font-body);
+      font-size: clamp(.85rem, 1.2vw, .95rem);
+      color: var(--gray-600); line-height: 1.7;
+      margin-bottom: 28px; max-width: 380px;
+    }
+
+    /* Mini grid de las 3 prendas principales — estilo Milfshakes */
+    .hero-mini-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 6px; margin-bottom: 28px;
+    }
+    .hero-mini-card {
+      aspect-ratio: 3/4;
+      background: var(--cream-dark);
+      border-radius: 8px; overflow: hidden;
+      position: relative; cursor: pointer;
+      transition: transform .2s;
+      text-decoration: none; display: block;
+    }
+    .hero-mini-card:hover { transform: translateY(-3px); }
+    .hero-mini-card img {
+      width: 100%; height: 100%; object-fit: contain;
+      padding: 10%;
+      transition: transform .4s;
+    }
+    .hero-mini-card:hover img { transform: scale(1.06); }
+    .hero-mini-card-label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(to top, rgba(28,26,23,.55), transparent);
+      padding: 12px 8px 8px;
+      font-family: var(--font-body);
+      font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+      color: #fff;
+    }
+
+    .hero-ctas {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    }
+    .btn-hero-primary {
+      font-family: var(--font-body);
+      font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      background: var(--carbon); color: #fff;
+      border-radius: 30px; padding: 14px 28px;
+      border: none; cursor: pointer; text-decoration: none;
+      transition: background .18s, transform .15s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-hero-primary:hover { background: var(--purple); transform: translateY(-1px); }
+    .btn-hero-ghost {
+      font-family: var(--font-body);
+      font-size: 11px; font-weight: 500; letter-spacing: .08em;
+      color: var(--gray-600); text-decoration: none;
+      border-bottom: 1px solid var(--cream-mid);
+      padding-bottom: 1px;
+      transition: color .15s, border-color .15s;
+    }
+    .btn-hero-ghost:hover { color: var(--purple); border-color: var(--purple); }
+
+    /* ══ TICKER CINTA ══ — Estilo Chill Colombia */
+    .ticker {
+      background: var(--carbon);
+      overflow: hidden;
+      padding: 11px 0;
+      border-top: 1px solid rgba(255,255,255,.05);
+    }
+    .ticker-track {
+      display: flex; gap: 0;
+      animation: ticker-anim 30s linear infinite;
+      width: max-content;
+    }
+    .ticker-track:hover { animation-play-state: paused; }
+    .ticker-item {
+      white-space: nowrap;
+      font-family: var(--font-body);
+      font-size: 10px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase;
+      color: rgba(250,249,246,.5);
+      padding: 0 32px;
+      display: flex; align-items: center; gap: 32px;
+    }
+    .ticker-item span { color: var(--purple-xlight); }
+    @keyframes ticker-anim { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ══ SECCIÓN "NUEVA COLECCIÓN" — Grid de prendas estilo tienda ══ */
+    .coleccion-section {
+      padding: clamp(40px, 6vw, 80px) clamp(16px, 5vw, 64px);
+      background: var(--white);
+    }
+    .coleccion-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 32px;
+    }
+    .coleccion-header-left {}
+    .coleccion-eyebrow {
+      font-family: var(--font-body);
+      font-size: 9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--gray-400); margin-bottom: 6px;
+    }
+    .coleccion-titulo {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 300; color: var(--carbon); line-height: 1.1;
+    }
+    .coleccion-ver-todo {
+      font-family: var(--font-body);
+      font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--carbon); border-bottom: 1px solid var(--carbon);
+      padding-bottom: 2px; text-decoration: none;
+      transition: color .15s, border-color .15s;
+    }
+    .coleccion-ver-todo:hover { color: var(--purple); border-color: var(--purple); }
+
+    /* Grid de productos — 4 columnas como Milfshakes */
+    .productos-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .producto-card {
+      text-decoration: none; display: block;
+      color: inherit;
+    }
+    .producto-card-img {
+      aspect-ratio: 3/4;
+      background: var(--cream-dark);
+      border-radius: 10px; overflow: hidden;
+      position: relative; margin-bottom: 10px;
+      transition: box-shadow .2s;
+    }
+    .producto-card:hover .producto-card-img {
+      box-shadow: 0 8px 28px rgba(28,26,23,.1);
+    }
+    .producto-card-img img {
+      width: 100%; height: 100%;
+      object-fit: contain; padding: 8%;
+      transition: transform .45s cubic-bezier(.25,.46,.45,.94);
+    }
+    .producto-card:hover .producto-card-img img { transform: scale(1.05); }
+
+    /* Badge en la card */
+    .producto-badge {
+      position: absolute; top: 10px; left: 10px;
+      font-family: var(--font-body);
+      font-size: 8px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 12px;
+    }
+    .producto-badge--new { background: var(--carbon); color: #fff; }
+    .producto-badge--ar  { background: var(--purple); color: #fff; }
+    .producto-badge--limited { background: #fff; color: var(--carbon); border: 1px solid var(--cream-mid); }
+
+    /* Swatches de color en la card — estilo Milfshakes */
+    .producto-swatches {
+      position: absolute; bottom: 10px; left: 10px;
+      display: flex; gap: 5px;
+    }
+    .producto-swatch {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.7);
+      transition: transform .15s, border-color .15s;
+      cursor: pointer;
+    }
+    .producto-swatch:hover { transform: scale(1.2); border-color: var(--carbon); }
+    .producto-swatch.active { border-color: var(--carbon); }
+
+    /* Info de la card */
+    .producto-card-info { padding: 0 2px; }
+    .producto-card-nombre {
+      font-family: var(--font-body);
+      font-size: 12px; font-weight: 600; color: var(--carbon);
+      margin-bottom: 2px; letter-spacing: .01em;
+    }
+    .producto-card-sub {
+      font-family: var(--font-display);
+      font-size: .78rem; color: var(--gray-400); font-style: italic;
+    }
+    .producto-card-tallas {
+      display: flex; gap: 3px; margin-top: 5px;
+    }
+    .producto-card-tallas span {
+      font-family: var(--font-body);
+      font-size: 8.5px; font-weight: 500; letter-spacing: .05em;
+      color: var(--gray-400); border: 1px solid var(--cream-mid);
+      border-radius: 3px; padding: 1px 5px;
+    }
+
+    /* ══ BANNER EDITORIAL DE CORTES ══ — Estilo Milfshakes */
+    .cortes-banner {
+      background: var(--cream-dark);
+      padding: clamp(40px, 5vw, 64px) clamp(16px, 5vw, 64px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px; align-items: center;
+      border-top: 1px solid var(--cream-mid);
+    }
+    .cortes-copy {}
+    .cortes-eyebrow {
+      font-family: var(--font-body);
+      font-size: 9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--gray-400); margin-bottom: 10px;
+    }
+    .cortes-titulo {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+      font-weight: 300; color: var(--carbon);
+      line-height: 1.1; margin-bottom: 16px;
+    }
+    .cortes-titulo em { color: var(--purple); font-style: italic; }
+    .cortes-desc {
+      font-family: var(--font-body);
+      font-size: .85rem; color: var(--gray-600); line-height: 1.7;
+      margin-bottom: 24px; max-width: 400px;
+    }
+
+    /* Los 3 tipos de corte como pills visuales */
+    .cortes-tipos {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .corte-tipo-pill {
+      font-family: var(--font-body);
+      font-size: 10px; font-weight: 600; letter-spacing: .06em;
+      color: var(--carbon); background: #fff;
+      border: 1.5px solid var(--cream-mid);
+      border-radius: 24px; padding: 8px 16px;
+      display: flex; align-items: center; gap: 7px;
+      transition: border-color .15s, background .15s;
+    }
+    .corte-tipo-pill:hover { border-color: var(--carbon); }
+    .corte-tipo-pill-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--carbon); flex-shrink: 0;
+    }
+
+    /* Imagen comparativa de cortes */
+    .cortes-imgs {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+    }
+    .corte-img-item {
+      aspect-ratio: 2/3;
+      background: var(--cream);
+      border-radius: 8px; overflow: hidden;
+      text-align: center;
+      display: flex; flex-direction: column;
+      border: 1px solid var(--cream-mid);
+    }
+    .corte-img-item-img {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 12px;
+    }
+    .corte-img-item-img img {
+      width: 100%; height: 100%; object-fit: contain;
+    }
+    .corte-img-label {
+      font-family: var(--font-body);
+      font-size: 8.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--gray-600); padding: 8px; background: var(--cream-dark);
+      border-top: 1px solid var(--cream-mid);
+    }
+
+    /* ══ FRANJA AR ══ */
+    .ar-franja {
+      background: var(--carbon);
+      padding: clamp(32px, 5vw, 60px) clamp(16px, 5vw, 64px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px; align-items: center;
+    }
+    .ar-franja-copy {}
+    .ar-franja-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-body);
+      font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--purple-xlight);
+      background: rgba(201,158,232,.12); border: 1px solid rgba(201,158,232,.2);
+      border-radius: 20px; padding: 5px 12px; margin-bottom: 16px;
+    }
+    .ar-franja-pill-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--purple-xlight);
+      animation: pulse-ar 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse-ar { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(.5)} }
+    .ar-franja-titulo {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+      font-weight: 300; color: var(--cream); line-height: 1.1;
+      margin-bottom: 14px;
+    }
+    .ar-franja-titulo em { color: var(--purple-xlight); font-style: italic; }
+    .ar-franja-desc {
+      font-family: var(--font-body);
+      font-size: .84rem; color: rgba(250,249,246,.55); line-height: 1.7;
+      margin-bottom: 24px; max-width: 380px;
+    }
+    .ar-franja-steps {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 24px;
+    }
+    .ar-step {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .ar-step-n {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: rgba(201,158,232,.18); border: 1px solid rgba(201,158,232,.3);
+      color: var(--purple-xlight);
+      font-family: var(--font-body); font-size: 9px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .ar-step-txt {
+      font-family: var(--font-body); font-size: 10px; font-weight: 500;
+      color: rgba(250,249,246,.65); letter-spacing: .04em;
+    }
+    .ar-step-sep {
+      color: rgba(250,249,246,.2); font-size: 10px;
+    }
+    .btn-ar-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-body);
+      font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      background: var(--purple); color: #fff;
+      border-radius: 30px; padding: 13px 24px;
+      text-decoration: none; transition: background .18s, transform .15s;
+    }
+    .btn-ar-cta:hover { background: var(--purple-mid); transform: translateY(-1px); }
+
+    /* Grid de diseños AR */
+    .ar-franja-cards {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    }
+    .ar-card {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px; overflow: hidden;
+      text-decoration: none; display: block;
+      transition: background .18s, transform .2s;
+    }
+    .ar-card:hover { background: rgba(255,255,255,.1); transform: translateY(-2px); }
+    .ar-card-img {
+      aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+      padding: 10%;
+    }
+    .ar-card-img img { width: 100%; height: 100%; object-fit: contain; }
+    .ar-card-body {
+      padding: 10px 12px;
+      border-top: 1px solid rgba(255,255,255,.07);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .ar-card-nombre {
+      font-family: var(--font-body);
+      font-size: 10px; font-weight: 600; color: rgba(250,249,246,.8);
+    }
+    .ar-badge {
+      font-family: var(--font-body);
+      font-size: 7.5px; font-weight: 700; letter-spacing: .1em;
+      background: var(--purple); color: #fff;
+      border-radius: 10px; padding: 2px 6px;
+    }
+
+    /* ══ SOBRE LA MARCA — bloque editorial ══ */
+    .sobre-marca {
+      padding: clamp(40px, 6vw, 80px) clamp(16px, 5vw, 64px);
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 48px; align-items: center;
+      background: var(--cream); border-top: 1px solid var(--cream-mid);
+    }
+    .sobre-copy {}
+    .sobre-eyebrow {
+      font-family: var(--font-body);
+      font-size: 9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--gray-400); margin-bottom: 12px;
+    }
+    .sobre-titulo {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 2.8vw, 2.2rem);
+      font-weight: 300; color: var(--carbon); line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .sobre-titulo em { color: var(--purple); font-style: italic; }
+    .sobre-texto {
+      font-family: var(--font-body);
+      font-size: .85rem; color: var(--gray-600); line-height: 1.8;
+    }
+
+    /* Grid de features */
+    .sobre-features {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    .feature-item {
+      background: var(--cream-dark); border-radius: 10px;
+      padding: 18px 16px; border: 1px solid var(--cream-mid);
+    }
+    .feature-icon {
+      font-size: 1.4rem; margin-bottom: 8px;
+    }
+    .feature-titulo {
+      font-family: var(--font-body);
+      font-size: 11px; font-weight: 700; letter-spacing: .04em; color: var(--carbon);
+      margin-bottom: 4px;
+    }
+    .feature-desc {
+      font-family: var(--font-body);
+      font-size: .76rem; color: var(--gray-400); line-height: 1.5;
+    }
+
+    /* ══ FOOTER ══ */
+    .footer {
+      background: var(--carbon);
+      padding: clamp(32px,5vw,60px) clamp(16px,5vw,64px) 20px;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr;
+      gap: 40px; padding-bottom: 32px;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      margin-bottom: 20px;
+    }
+    .footer-brand-name {
+      font-family: var(--font-display);
+      font-size: 1.6rem; font-weight: 300; color: var(--cream);
+      letter-spacing: .05em; display: block; margin-bottom: 10px;
+    }
+    .footer-tagline {
+      font-family: var(--font-body);
+      font-size: .78rem; color: rgba(250,249,246,.4); line-height: 1.6;
+      max-width: 280px; margin-bottom: 16px;
+    }
+    .footer-pedidos-box {
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
+      border-radius: 8px; padding: 12px 14px; margin-bottom: 16px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .footer-pedidos-box svg { flex-shrink: 0; color: var(--purple-xlight); margin-top: 1px; }
+    .footer-pedidos-box p {
+      font-family: var(--font-body); font-size: .76rem;
+      color: rgba(250,249,246,.5); line-height: 1.5;
+    }
+    .footer-pedidos-box strong { color: rgba(250,249,246,.8); font-weight: 600; display: block; margin-bottom: 2px; }
+    .footer-social { display: flex; gap: 10px; }
+    .footer-social a {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(250,249,246,.6); transition: background .15s, color .15s;
+    }
+    .footer-social a:hover { background: var(--purple); color: #fff; }
+    .footer-col h4 {
+      font-family: var(--font-body);
+      font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+      color: rgba(250,249,246,.4); margin-bottom: 12px;
+    }
+    .footer-col ul { display: flex; flex-direction: column; gap: 8px; }
+    .footer-col a {
+      font-family: var(--font-body); font-size: .8rem;
+      color: rgba(250,249,246,.55); transition: color .15s;
+    }
+    .footer-col a:hover { color: var(--purple-xlight); }
+    .footer-bottom {
+      font-family: var(--font-body); font-size: .72rem;
+      color: rgba(250,249,246,.25); text-align: center;
+    }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 1024px) {
+      .productos-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 820px) {
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-img-side { height: 55vw; min-height: 280px; }
+      .hero-copy-side { border-left: none; border-top: 1px solid var(--cream-mid); }
+      .hero-mini-grid { grid-template-columns: repeat(3, 1fr); }
+      .productos-grid { grid-template-columns: repeat(2, 1fr); }
+      .cortes-banner { grid-template-columns: 1fr; }
+      .ar-franja { grid-template-columns: 1fr; }
+      .sobre-marca { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 500px) {
+      .productos-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .hero-mini-grid { display: none; }
+      .cortes-imgs { grid-template-columns: repeat(3, 1fr); }
+      .ar-franja-cards { grid-template-columns: repeat(3, 1fr); }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══ ANNOUNCEMENT BAR ══ -->
+  <div class="announce-bar">
+    Nueva Colección 2026 — <span>Cortes: Clásico · Oversize · Boxy Fit</span> — Pedidos por Instagram
+  </div>
+
+  <!-- ══ NAVBAR ══ -->
+  <nav class="navbar" id="mainNav">
+    <a href="index.html">
+      <div class="brand-container">
+        <img src="src/assets/images/logo.png" class="brand-logo" alt="Logo">
+        <span class="brand-name">LOOK LAB IVVI</span>
+      </div>
+    </a>
+    <button class="navbar-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="navbar-links" id="navLinks">
+      <li><a href="index.html" class="active">Inicio</a></li>
+      <li><a href="coleccion.html">Colección</a></li>
+      <li><a href="ar-section.html">Diseños RA <span class="badge-ar">AR</span></a></li>
+      <li><a href="probador.html">Probador Virtual</a></li>
+      <li><a href="#contacto" class="nav-contacto">Pedidos</a></li>
+    </ul>
+  </nav>
+
+  <!-- ══ HERO — SPLIT EDITORIAL ══ -->
+  <section class="hero">
+
+    <!-- Imagen principal -->
+    <div class="hero-img-side" id="heroImgSide">
+      <span class="hero-col-pill">✦ Nueva Colección 2026</span>
+      <a href="detalle-disenio.html?id=1">
+        <img id="heroImgMain" src="src/assets/images/rosax.png" alt="Prenda destacada"
+             onerror="this.style.opacity='.3'"/>
+      </a>
+      <!-- Swatches de color -->
+      <div class="hero-swatches">
+        <button class="hero-swatch active" style="background:#F5F3EE; outline:1px solid #ccc"
+          data-src="assets/mockups/rosablanco.png" data-href="detalle-disenio.html?id=1"
+          aria-label="Blanco"></button>
+        <button class="hero-swatch" style="background:#1C1A17"
+          data-src="assets/mockups/rosanegro.png" data-href="detalle-disenio.html?id=1"
+          aria-label="Negro"></button>
+        <button class="hero-swatch" style="background:#C0292E"
+          data-src="src/assets/images/rosax.png" data-href="detalle-disenio.html?id=1"
+          aria-label="Rosa"></button>
+      </div>
+    </div>
+
+    <!-- Copy lado derecho -->
+    <div class="hero-copy-side">
+      <p class="hero-eyebrow">Look Lab IVVI 2026</p>
+
+      <h1 class="hero-titulo">
+        Diseño<br>que <em>cobra vida</em>
+      </h1>
+
+      <p class="hero-desc">
+        Tres diseños únicos — Rosa, Girasol y Gloxinia — disponibles en corte Clásico, Oversize y Boxy Fit. Cada prenda incluye su experiencia de Realidad Aumentada.
+      </p>
+
+      <!-- Mini grid de las 3 prendas -->
+      <div class="hero-mini-grid">
+        <a href="detalle-disenio.html?id=1" class="hero-mini-card">
+          <img src="assets/prendas/rossar-over.png" alt="Rosa" onerror="this.style.opacity='.2'"/>
+          <div class="hero-mini-card-label">Rosa</div>
+        </a>
+        <a href="detalle-disenio.html?id=2" class="hero-mini-card">
+          <img src="assets/prendas/girasoln-over.png" alt="Girasol" onerror="this.style.opacity='.2'"/>
+          <div class="hero-mini-card-label">Girasol</div>
+        </a>
+        <a href="detalle-disenio.html?id=3" class="hero-mini-card">
+          <img src="assets/prendas/gloxg-over.png" alt="Gloxinia" onerror="this.style.opacity='.2'"/>
+          <div class="hero-mini-card-label">Gloxinia</div>
+        </a>
+      </div>
+
+      <div class="hero-ctas">
+        <a href="coleccion.html" class="btn-hero-primary">
+          Ver todas las prendas →
+        </a>
+        <a href="disenios-ra.html" class="btn-hero-ghost">Explorar AR</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ TICKER ══ -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <!-- duplicado para loop continuo -->
+      <div class="ticker-item">Look Lab IVVI <span>✦</span> Nueva Colección 2026 <span>✦</span> Corte Clásico <span>·</span> Oversize <span>·</span> Boxy Fit <span>✦</span> Rosa <span>·</span> Girasol <span>·</span> Gloxinia <span>✦</span> Realidad Aumentada <span>✦</span></div>
+      <div class="ticker-item">Look Lab IVVI <span>✦</span> Nueva Colección 2026 <span>✦</span> Corte Clásico <span>·</span> Oversize <span>·</span> Boxy Fit <span>✦</span> Rosa <span>·</span> Girasol <span>·</span> Gloxinia <span>✦</span> Realidad Aumentada <span>✦</span></div>
+    </div>
+  </div>
+
+  <!-- ══ ADELANTO DE COLECCIÓN ══ -->
+  <section class="coleccion-section">
+    <div class="coleccion-header">
+      <div class="coleccion-header-left">
+        <p class="coleccion-eyebrow">Un adelanto</p>
+        <h2 class="coleccion-titulo">Diseños destacados</h2>
+      </div>
+      <a href="coleccion.html" class="coleccion-ver-todo">Ver toda la colección →</a>
+    </div>
+
+    <div class="productos-grid">
+
+      <!-- ROSA -->
+      <a href="detalle-disenio.html?id=1&color=0" class="producto-card">
+        <div class="producto-card-img">
+          <img src="assets/mockups/rosablanco.png" alt="Rosa" onerror="this.style.opacity='.3'"/>
+          <span class="producto-badge producto-badge--ar">AR</span>
+          <div class="producto-swatches">
+            <span class="producto-swatch active" style="background:#F5F3EE;outline:1px solid #ccc"></span>
+            <span class="producto-swatch" style="background:#1C1A17"></span>
+            <span class="producto-swatch" style="background:#C0292E"></span>
+          </div>
+        </div>
+        <div class="producto-card-info">
+          <p class="producto-card-nombre">Rosa</p>
+          <p class="producto-card-sub">3 colores · Clásico · Oversize · Boxy</p>
+          <div class="producto-card-tallas"><span>XS</span><span>S</span><span>M</span><span>L</span><span>XL</span></div>
+        </div>
+      </a>
+
+      <!-- GIRASOL -->
+      <a href="detalle-disenio.html?id=2&color=0" class="producto-card">
+        <div class="producto-card-img">
+          <img src="assets/mockups/girasolnegro.png" alt="Girasol" onerror="this.style.opacity='.3'"/>
+          <span class="producto-badge producto-badge--ar">AR</span>
+          <div class="producto-swatches">
+            <span class="producto-swatch active" style="background:#1C1A17"></span>
+            <span class="producto-swatch" style="background:#F5F3EE;outline:1px solid #ccc"></span>
+          </div>
+        </div>
+        <div class="producto-card-info">
+          <p class="producto-card-nombre">Girasol</p>
+          <p class="producto-card-sub">2 colores · Clásico · Oversize · Boxy</p>
+          <div class="producto-card-tallas"><span>XS</span><span>S</span><span>M</span><span>L</span><span>XL</span></div>
+        </div>
+      </a>
+
+      <!-- GLOXINIA -->
+      <a href="detalle-disenio.html?id=3&color=0" class="producto-card">
+        <div class="producto-card-img">
+          <img src="assets/mockups/gloxblanca.png" alt="Gloxinia" onerror="this.style.opacity='.3'"/>
+          <span class="producto-badge producto-badge--limited">Limited</span>
+          <div class="producto-swatches">
+            <span class="producto-swatch active" style="background:#F5F3EE;outline:1px solid #ccc"></span>
+            <span class="producto-swatch" style="background:#1C1A17"></span>
+          </div>
+        </div>
+        <div class="producto-card-info">
+          <p class="producto-card-nombre">Gloxinia</p>
+          <p class="producto-card-sub">2 colores · Clásico · Oversize · Boxy</p>
+          <div class="producto-card-tallas"><span>XS</span><span>S</span><span>M</span><span>L</span><span>XL</span></div>
+        </div>
+      </a>
+
+      <!-- BALLENA -->
+      <a href="detalle-disenio.html?id=9&color=0" class="producto-card">
+        <div class="producto-card-img">
+          <img src="assets/mockups/ballenablanco.png" alt="Ballena" onerror="this.style.opacity='.3'"/>
+          <span class="producto-badge producto-badge--ar">AR</span>
+          <div class="producto-swatches">
+            <span class="producto-swatch active" style="background:#F5F3EE;outline:1px solid #ccc"></span>
+            <span class="producto-swatch" style="background:#1C1A17"></span>
+          </div>
+        </div>
+        <div class="producto-card-info">
+          <p class="producto-card-nombre">Ballena</p>
+          <p class="producto-card-sub">2 colores · Clásico · Oversize · Boxy</p>
+          <div class="producto-card-tallas"><span>XS</span><span>S</span><span>M</span><span>L</span></div>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- CTA ver todo -->
+    <div style="text-align:center; margin-top:36px;">
+      <a href="coleccion.html" class="btn-hero-primary">
+        Ver toda la colección →
+      </a>
+    </div>
+  </section>
+
+  <!-- ══ BANNER DE CORTES ══ -->
+  <section class="cortes-banner">
+    <div class="cortes-copy">
+      <p class="cortes-eyebrow">Personalización</p>
+      <h2 class="cortes-titulo">Tu prenda,<br>tu <em>corte</em></h2>
+      <p class="cortes-desc">
+        Cada diseño está disponible en tres siluetas distintas. Elige el fit que mejor va con tu estilo — todos hechos en algodón 100%, gramaje 200gr.
+      </p>
+      <div class="cortes-tipos">
+        <div class="corte-tipo-pill">
+          <span class="corte-tipo-pill-dot"></span>
+          Clásico
+        </div>
+        <div class="corte-tipo-pill">
+          <span class="corte-tipo-pill-dot"></span>
+          Oversize
+        </div>
+        <div class="corte-tipo-pill">
+          <span class="corte-tipo-pill-dot"></span>
+          Boxy Fit
+        </div>
+      </div>
+    </div>
+
+    <div class="cortes-imgs">
+      <div class="corte-img-item">
+        <div class="corte-img-item-img">
+          <img src="assets/prendas/headn-reg.png" alt="Corte Clásico" onerror="this.style.opacity='.2'"/>
+        </div>
+        <div class="corte-img-label">Clásico</div>
+      </div>
+      <div class="corte-img-item">
+        <div class="corte-img-item-img">
+          <img src="assets/prendas/headn-over.png" alt="Corte Oversize" onerror="this.style.opacity='.2'"/>
+        </div>
+        <div class="corte-img-label">Oversize</div>
+      </div>
+      <div class="corte-img-item">
+        <div class="corte-img-item-img">
+          <img src="assets/prendas/headn-boxy.png" alt="Boxy Fit" onerror="this.style.opacity='.2'"/>
+        </div>
+        <div class="corte-img-label">Boxy Fit</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FRANJA AR ══ -->
+  <section class="ar-franja">
+    <div class="ar-franja-copy">
+      <div class="ar-franja-pill">
+        <span class="ar-franja-pill-dot"></span>
+        Experiencia exclusiva
+      </div>
+      <h2 class="ar-franja-titulo">
+        Realidad<br><em>Aumentada</em>
+      </h2>
+      <p class="ar-franja-desc">
+        Imprime el diseño de tu prenda, abre la experiencia y observa cómo cobra vida ante tu cámara. Sin apps. Sin instalaciones.
+      </p>
+      <div class="ar-franja-steps">
+        <div class="ar-step">
+          <div class="ar-step-n">1</div>
+          <span class="ar-step-txt">Imprime</span>
+        </div>
+        <div class="ar-step-sep">→</div>
+        <div class="ar-step">
+          <div class="ar-step-n">2</div>
+          <span class="ar-step-txt">Activa</span>
+        </div>
+        <div class="ar-step-sep">→</div>
+        <div class="ar-step">
+          <div class="ar-step-n">3</div>
+          <span class="ar-step-txt">Vive ✦</span>
+        </div>
+      </div>
+      <a href="disenios-ra.html" class="btn-ar-cta">
+        <span class="ar-franja-pill-dot"></span>
+        Explorar Diseños AR
+      </a>
+    </div>
+
+    <div class="ar-franja-cards">
+      <a href="ar/ar-disenio1.html" class="ar-card">
+        <div class="ar-card-img">
+          <img src="src/assets/images/rosax.png" alt="Rosa AR" onerror="this.style.opacity='.2'"/>
+        </div>
+        <div class="ar-card-body">
+          <span class="ar-card-nombre">Rosa</span>
+          <span class="ar-badge">AR</span>
+        </div>
+      </a>
+      <a href="ar/ar-disenio2.html" class="ar-card">
+        <div class="ar-card-img">
+          <img src="src/assets/images/girasolx.png" alt="Girasol AR" onerror="this.style.opacity='.2'"/>
+        </div>
+        <div class="ar-card-body">
+          <span class="ar-card-nombre">Girasol</span>
+          <span class="ar-badge">AR</span>
+        </div>
+      </a>
+      <a href="ar/ar-disenio3.html" class="ar-card">
+        <div class="ar-card-img">
+          <img src="src/assets/images/gloxiniax.png" alt="Gloxinia AR" onerror="this.style.opacity='.2'"/>
+        </div>
+        <div class="ar-card-body">
+          <span class="ar-card-nombre">Gloxinia</span>
+          <span class="ar-badge">AR</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ══ SOBRE LA MARCA ══ -->
+  <section class="sobre-marca">
+    <div class="sobre-copy">
+      <p class="sobre-eyebrow">Quiénes somos</p>
+      <h2 class="sobre-titulo">Moda con<br><em>propósito</em></h2>
+      <p class="sobre-texto">
+        LOOK LAB IVVI nace de la pasión por el diseño floral y la tecnología. Cada prenda es una obra de arte usable, con tres siluetas distintas para adaptarse a cada cuerpo y estilo.<br><br>
+        Combinamos diseño colombiano con Realidad Aumentada para que puedas vivir la prenda antes de decidir.
+      </p>
+    </div>
+    <div class="sobre-features">
+      <div class="feature-item">
+        <div class="feature-icon">🌸</div>
+        <div class="feature-titulo">Diseño floral único</div>
+        <div class="feature-desc">Rosa, Girasol y Gloxinia — cada motivo diseñado a mano.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📱</div>
+        <div class="feature-titulo">Realidad Aumentada</div>
+        <div class="feature-desc">Activa la experiencia AR desde cualquier navegador.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">👕</div>
+        <div class="feature-titulo">3 cortes disponibles</div>
+        <div class="feature-desc">Clásico, Oversize y Boxy Fit para cada figura.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🇨🇴</div>
+        <div class="feature-titulo">Hecho en Colombia</div>
+        <div class="feature-desc">Algodón 100%, 200gr. Calidad artesanal local.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="footer" id="contacto">
+    <div class="footer-grid">
+      <div>
+        <span class="footer-brand-name">LOOK LAB IVVI</span>
+        <p class="footer-tagline">Moda con Realidad Aumentada. Diseños florales únicos que cobran vida ante tu cámara.</p>
+        <div class="footer-pedidos-box">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          <p><strong>Pedidos por Instagram</strong>Por ahora los pedidos se realizan a través del chat de Instagram. ¡Escríbenos!</p>
+        </div>
+        <div class="footer-social">
+          <a href="https://www.instagram.com/ivvi__design/" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+          <a href="https://www.tiktok.com/@ivvi_design" target="_blank" rel="noopener" aria-label="TikTok">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.84 4.84 0 01-1.01-.07z"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Navegar</h4>
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="coleccion.html">Colección</a></li>
+          <li><a href="disenios-ra.html">Diseños AR</a></li>
+          <li><a href="probador.html">Probador Virtual</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        <ul>
+          <li><a href="https://www.instagram.com/ivvi__design/" target="_blank" rel="noopener">Instagram @ivvi__design</a></li>
+          <li><a href="https://www.tiktok.com/@ivvi_design" target="_blank" rel="noopener">TikTok @ivvi_design</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 LOOK LAB IVVI · Todos los derechos reservados</p>
+    </div>
+  </footer>
+
+</div><!-- /#app -->
+
+<script src="src/scripts/navbar.js"></script>
+<script>
+  /* Scroll navbar */
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 10));
+
+  /* Smooth scroll al footer */
+  document.querySelectorAll('a[href="#contacto"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.getElementById('contacto').scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  /* Hero swatches — cambia la imagen principal */
+  document.querySelectorAll('.hero-swatch').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.hero-swatch').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const img = document.getElementById('heroImgMain');
+      const link = document.querySelector('.hero-img-side a');
+      if (btn.dataset.src) {
+        img.src = btn.dataset.src;
+        img.style.opacity = '1';
+      }
+      if (btn.dataset.href && link) link.href = btn.dataset.href;
+    });
+  });
+</script>
+</body>
+</html>

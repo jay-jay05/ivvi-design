@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Colección — LOOK LAB IVVI</title>
+  <link rel="stylesheet" href="src/styles/main.css"/>
+  <link rel="stylesheet" href="src/styles/navbar.css"/>
+  <link rel="icon" type="image/png" href="src/assets/images/faviiicon.png">
+  <style>
+    * { box-sizing: border-box; }
+    #app { padding-top: 62px; }
+
+    .col-header {
+      background: var(--cream);
+      padding: clamp(32px,5vw,56px) clamp(16px,5vw,64px) clamp(24px,3vw,40px);
+      border-bottom: 1px solid var(--cream-mid);
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 24px; flex-wrap: wrap;
+    }
+    .col-eyebrow {
+      font-family: var(--font-body);
+      font-size: 9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--gray-400); margin-bottom: 8px;
+    }
+    .col-titulo {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem,3.5vw,3rem); font-weight: 300; color: var(--carbon); line-height: 1.05;
+    }
+    .col-subtitulo {
+      font-family: var(--font-body);
+      font-size: .82rem; color: var(--gray-400); margin-top: 8px; line-height: 1.6;
+    }
+    .col-total-pill {
+      font-family: var(--font-body);
+      font-size: 10px; font-weight: 600; letter-spacing: .08em;
+      color: var(--purple); background: var(--purple-tint);
+      border-radius: 20px; padding: 5px 12px;
+    }
+
+    /* TABS */
+    .col-tabs-bar {
+      position: sticky; top: 62px; z-index: 50;
+      background: var(--white);
+      border-bottom: 1.5px solid var(--cream-mid);
+      display: flex; align-items: center;
+      padding: 0 clamp(16px,5vw,64px);
+      box-shadow: 0 2px 12px rgba(28,26,23,.04);
+    }
+    .col-tab {
+      font-family: var(--font-body);
+      font-size: 12px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+      color: var(--gray-400); background: none; border: none;
+      padding: 14px 24px 16px; cursor: pointer;
+      position: relative; white-space: nowrap; transition: color .18s;
+    }
+    .col-tab::after {
+      content: ''; position: absolute; bottom: -1.5px; left: 0; right: 0;
+      height: 2.5px; background: var(--carbon);
+      transform: scaleX(0); transition: transform .22s cubic-bezier(.25,.46,.45,.94);
+      border-radius: 2px 2px 0 0;
+    }
+    .col-tab:hover { color: var(--carbon); }
+    .col-tab.active { color: var(--carbon); }
+    .col-tab.active::after { transform: scaleX(1); }
+    .col-tab-count {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--cream-mid); color: var(--gray-400);
+      font-size: 9px; font-weight: 700; min-width: 18px; height: 18px;
+      border-radius: 20px; padding: 0 5px; margin-left: 6px;
+      transition: background .18s, color .18s;
+    }
+    .col-tab.active .col-tab-count { background: var(--carbon); color: #fff; }
+    .col-tab-soon {
+      font-size: 8.5px; font-weight: 600; letter-spacing: .06em;
+      background: var(--cream-dark); color: var(--gray-400);
+      border-radius: 10px; padding: 2px 7px; margin-left: 6px;
+    }
+
+    /* SECCIONES */
+    .col-seccion { display: none; }
+    .col-seccion.activa { display: block; animation: fadeUp .3s ease both; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+    /* FILTROS */
+    .col-filtros-bar {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      padding: 16px clamp(16px,5vw,64px);
+      background: var(--cream); border-bottom: 1px solid var(--cream-mid);
+    }
+    .col-filtro-label {
+      font-family: var(--font-body);
+      font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--gray-400); margin-right: 4px;
+    }
+    .col-filtro {
+      font-family: var(--font-body);
+      font-size: 10px; font-weight: 600; letter-spacing: .05em;
+      color: var(--gray-600); background: var(--white);
+      border: 1.5px solid var(--cream-mid); border-radius: 20px;
+      padding: 6px 14px; cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+    .col-filtro:hover { border-color: var(--carbon); color: var(--carbon); }
+    .col-filtro.active { background: var(--carbon); color: #fff; border-color: var(--carbon); }
+
+    /* GRID */
+    .col-grid-wrap {
+      padding: clamp(20px,3vw,36px) clamp(16px,5vw,64px) clamp(40px,6vw,80px);
+      background: var(--white);
+    }
+    .col-grid {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 20px;
+    }
+
+    /* CARD — Una sola por diseño */
+    .col-card { text-decoration: none; display: block; color: inherit; }
+    .col-card-img {
+      aspect-ratio: 3/4; background: var(--cream-dark);
+      border-radius: 12px; overflow: hidden;
+      position: relative; margin-bottom: 12px;
+      transition: box-shadow .25s, transform .25s;
+    }
+    .col-card:hover .col-card-img {
+      box-shadow: 0 16px 40px rgba(28,26,23,.13);
+      transform: translateY(-3px);
+    }
+    .col-card-img img {
+      width: 100%; height: 100%; object-fit: contain; padding: 6%;
+      transition: transform .45s cubic-bezier(.25,.46,.45,.94);
+    }
+    .col-card:hover .col-card-img img { transform: scale(1.04); }
+
+    /* Overlay de personalización al hover */
+    .col-card-overlay {
+      position: absolute; inset: 0;
+      background: rgba(28,26,23,.6);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .25s;
+      border-radius: 10px;
+    }
+    .col-card:hover .col-card-overlay { opacity: 1; }
+    .col-card-overlay span {
+      font-family: var(--font-body);
+      font-size: 11px; font-weight: 700; letter-spacing: .14em;
+      text-transform: uppercase; color: #fff;
+      border: 1.5px solid rgba(255,255,255,.7);
+      border-radius: 30px; padding: 10px 20px;
+    }
+
+    .col-badge {
+      position: absolute; top: 10px; left: 10px;
+      font-family: var(--font-body);
+      font-size: 8px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 12px;
+    }
+    .col-badge--new     { background: var(--carbon); color: #fff; }
+    .col-badge--ar      { background: var(--purple); color: #fff; }
+    .col-badge--limited { background: #fff; color: var(--carbon); border: 1px solid var(--cream-mid); }
+
+    /* Swatches de color en la card */
+    .col-card-swatches {
+      position: absolute; bottom: 10px; left: 10px; display: flex; gap: 5px;
+    }
+    .col-card-swatch {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.8);
+    }
+
+    .col-card-nombre {
+      font-family: var(--font-body); font-size: 14px; font-weight: 600; color: var(--carbon); margin-bottom: 3px;
+    }
+    .col-card-sub {
+      font-family: var(--font-display); font-size: .78rem; color: var(--gray-400); font-style: italic; margin-bottom: 6px;
+    }
+    .col-card-cortes {
+      font-family: var(--font-body); font-size: 9px; font-weight: 600;
+      letter-spacing: .06em; color: var(--purple); text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .col-card-tallas { display: flex; gap: 3px; flex-wrap: wrap; }
+    .col-card-tallas span {
+      font-family: var(--font-body); font-size: 8.5px; font-weight: 500;
+      color: var(--gray-400); border: 1px solid var(--cream-mid); border-radius: 3px; padding: 1px 5px;
+    }
+    .col-card.oculta { display: none; }
+
+    /* BANNER AR */
+    .col-ar-banner {
+      background: var(--carbon);
+      margin: 0 clamp(16px,5vw,64px) clamp(24px,4vw,48px);
+      border-radius: 14px; overflow: hidden;
+    }
+    .col-ar-banner-inner {
+      padding: clamp(24px,4vw,40px) clamp(24px,4vw,48px);
+      display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    }
+    .col-ar-banner-pill {
+      font-family: var(--font-body); font-size: 9px; font-weight: 700;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: var(--purple-xlight);
+      background: rgba(201,158,232,.12); border: 1px solid rgba(201,158,232,.2);
+      border-radius: 20px; padding: 5px 12px; flex-shrink: 0;
+    }
+    .col-ar-banner-inner p { font-family: var(--font-body); font-size: .84rem; color: rgba(250,249,246,.55); flex: 1; min-width: 180px; }
+    .col-ar-banner-inner strong { color: var(--purple-xlight); }
+    .btn-ar-col {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-body); font-size: 11px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      background: var(--purple); color: #fff; border-radius: 30px; padding: 12px 22px;
+      text-decoration: none; flex-shrink: 0; transition: background .18s;
+    }
+    .btn-ar-col:hover { background: var(--purple-mid); }
+
+    /* ─────────────────────────────────────
+       SECCIÓN CAMISETAS PERSONALIZADAS
+    ───────────────────────────────────── */
+    .col-custom-section {
+      padding: clamp(40px,6vw,80px) clamp(16px,5vw,64px);
+      background: var(--cream);
+      border-top: 1px solid var(--cream-mid);
+    }
+    .col-custom-header {
+      text-align: center;
+      margin-bottom: clamp(32px,4vw,56px);
+    }
+    .col-custom-eyebrow {
+      font-family: var(--font-body);
+      font-size: 9px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--purple); background: var(--purple-tint);
+      display: inline-block; border-radius: 20px; padding: 4px 14px;
+      margin-bottom: 12px;
+    }
+    .col-custom-titulo {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3vw, 2.6rem); font-weight: 300;
+      color: var(--carbon); margin-bottom: 10px;
+    }
+    .col-custom-desc {
+      font-family: var(--font-body);
+      font-size: .86rem; color: var(--gray-600); line-height: 1.7;
+      max-width: 480px; margin: 0 auto;
+    }
+    .col-custom-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .col-custom-card {
+      background: var(--white);
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--cream-mid);
+      transition: box-shadow .2s, transform .2s;
+    }
+    .col-custom-card:hover {
+      box-shadow: 0 12px 36px rgba(28,26,23,.09);
+      transform: translateY(-2px);
+    }
+    .col-custom-card-img {
+      aspect-ratio: 1;
+      background: #f0ede8;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .col-custom-card-img img {
+      width: 100%; height: 100%; object-fit: contain; padding: 4%;
+    }
+    .col-custom-card-body {
+      padding: 18px 20px 20px;
+    }
+    .col-custom-card-tag {
+      font-family: var(--font-body);
+      font-size: 8px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--purple); background: var(--purple-tint);
+      border-radius: 10px; padding: 3px 8px;
+      display: inline-block; margin-bottom: 8px;
+    }
+    .col-custom-card-titulo {
+      font-family: var(--font-body);
+      font-size: 14px; font-weight: 600; color: var(--carbon);
+      margin-bottom: 4px;
+    }
+    .col-custom-card-sub {
+      font-family: var(--font-display);
+      font-size: .78rem; color: var(--gray-400); font-style: italic;
+    }
+    .col-custom-cta {
+      text-align: center;
+      margin-top: 40px;
+    }
+    .btn-custom-pedir {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-family: var(--font-body); font-size: 12px; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+      background: var(--carbon); color: #fff;
+      border-radius: 30px; padding: 14px 32px;
+      text-decoration: none;
+      border: none; cursor: pointer;
+      transition: background .18s, transform .15s;
+    }
+    .btn-custom-pedir:hover { background: #333; transform: translateY(-1px); }
+
+    /* Buzos */
+    .col-pronto {
+      min-height: 50vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 16px; padding: 60px 24px; text-align: center; background: var(--cream);
+    }
+    .col-pronto-emoji { font-size: 3.5rem; animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    .col-pronto h2 { font-family: var(--font-display); font-size: clamp(1.8rem,3vw,2.4rem); font-weight: 300; color: var(--carbon); }
+    .col-pronto p { font-family: var(--font-body); font-size: .88rem; color: var(--gray-600); max-width: 360px; line-height: 1.7; }
+    .btn-volver-cam {
+      font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: .08em;
+      color: var(--carbon); background: none;
+      border: 1.5px solid var(--cream-mid); border-radius: 30px; padding: 10px 22px; cursor: pointer;
+      transition: border-color .15s;
+    }
+    .btn-volver-cam:hover { border-color: var(--carbon); }
+
+    .col-footer {
+      text-align: center; padding: 16px; font-size: .74rem; color: var(--gray-400);
+      border-top: 1px solid var(--cream-mid); background: var(--cream);
+    }
+    .col-footer a { color: var(--purple); }
+
+    @media (max-width: 1024px) { .col-grid { grid-template-columns: repeat(3,1fr); } }
+    @media (max-width: 700px)  { .col-grid { grid-template-columns: repeat(2,1fr); gap: 12px; } }
+    @media (max-width: 480px) {
+      .col-tabs-bar { overflow-x: auto; scrollbar-width: none; }
+      .col-tabs-bar::-webkit-scrollbar { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <nav class="navbar" id="mainNav">
+    <a href="index.html">
+      <div class="brand-container">
+        <img src="src/assets/images/logo.png" class="brand-logo" alt="Logo">
+        <span class="brand-name">LOOK LAB IVVI</span>
+      </div>
+    </a>
+    <button class="navbar-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="navbar-links" id="navLinks">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="coleccion.html" class="active">Colección</a></li>
+      <li><a href="disenios-ra.html">Diseños RA <span class="badge-ar">AR</span></a></li>
+      <li><a href="probador.html">Probador Virtual</a></li>
+    </ul>
+  </nav>
+
+  <header class="col-header">
+    <div>
+      <p class="col-eyebrow">LOOK LAB IVVI · 2026</p>
+      <h1 class="col-titulo">Colección completa</h1>
+      <p class="col-subtitulo">Cada diseño · Personaliza color de fondo, diseño y corte</p>
+    </div>
+    <span class="col-total-pill" id="totalPill">9 diseños</span>
+  </header>
+
+  <nav class="col-tabs-bar" role="tablist">
+    <button class="col-tab active" data-cat="camisetas" role="tab" aria-selected="true">
+      Camisetas <span class="col-tab-count" id="cnt-cam">9</span>
+    </button>
+    <button class="col-tab" data-cat="buzos" role="tab" aria-selected="false">
+      Buzos <span class="col-tab-soon">Próximamente</span>
+    </button>
+  </nav>
+
+  <!-- CAMISETAS -->
+  <div class="col-seccion activa" id="sec-camisetas">
+    <div class="col-filtros-bar">
+      <span class="col-filtro-label">Filtrar:</span>
+      <button class="col-filtro active" data-filter="all">Todos</button>
+      <button class="col-filtro" data-filter="rosa">🌹 Rosa</button>
+      <button class="col-filtro" data-filter="girasol">🌻 Girasol</button>
+      <button class="col-filtro" data-filter="gloxinia">🪻 Gloxinia</button>
+      <button class="col-filtro" data-filter="head">Head in the Clouds</button>
+      <button class="col-filtro" data-filter="otros">Otros</button>
+    </div>
+
+    <div class="col-grid-wrap">
+      <div class="col-grid" id="gridCamisetas">
+
+        <!-- Una tarjeta por diseño → al entrar se personaliza -->
+
+ <!-- REEMPLAZA la tarjeta id=1 existente -->
+<a href="detalle-disenio.html?id=1" class="col-card" data-diseño="rosa">
+  <div class="col-card-img">
+    <img src="assets/mockups/rosablanco.png" alt="Rosa" onerror="this.style.opacity='.3'"/>
+    <span class="col-badge col-badge--new">New</span>
+    <span class="col-badge col-badge--ar" style="left:auto;right:10px">AR</span>
+    <div class="col-card-swatches">
+      <span class="col-card-swatch" style="background:#F5F3EE;outline:1px solid #ccc" title="Blanco"></span>
+      <span class="col-card-swatch" style="background:#1C1A17" title="Negro"></span>
+      <span class="col-card-swatch" style="background:#C0292E" title="Rojo"></span>
+    </div>
+    <div class="col-card-overlay"><span>Personalizar →</span></div>
+  </div>
+  <div>
+    <p class="col-card-nombre">Rosa</p>
+    <p class="col-card-sub">3 colores de fondo · 2 colores de diseño · 3 cortes</p>
+    <p class="col-card-cortes">✦ Regular · Oversize · Boxy</p>
+    <div class="col-card-tallas"><span>XS</span><span>S</span><span>M</span><span>L</span><span>XL</span></div>
+  </div>
+</a>
+
+        <a href="detalle-disenio.html?id=2" class="col-card" data-diseño="girasol">
+          <div class="col-card-img">
+            <img src="assets/mockups/girasolnegro.png" alt="Girasol" onerror="this.style.opacity='.3'"/>
+            <span class="col-badge col-badge--new">New</span>
+            <span class="col-badge col-badge--ar" style="left:auto;right:10px">AR</span>
+            <div class="col-card-swatches">
+              <span class="col-card-swatch" style="background:#1C1A17"></span>
+              <span class="col-card-swatch" style="background:#F5F3EE;outline:1px solid #ccc"></span>
+            </div>
+            <div class="col-card-overlay"><span>Personalizar →</span></div>
+          </div>
+          <div>
+            <p class="col-card-nombre">Girasol</p>
+            <p class="col-card-sub">2 colores de fondo · 3 cortes</p>
+            <p class="col-card-cortes">✦ Regular · Oversize · Boxy</p>
+            <div class="col-card-tallas"><span>XS</span><span>S</span><span>M</span><span>L</span><span>XL</span></div>
+          </div>
+        </a>
+
+        <a href="detalle-disenio.html?id=3" class="col-card" data-diseño="gloxinia">
+          <div class="col-card-img">
+            <img src="assets/mockups/gloxblanca.png" alt="Gloxinia" onerror="this.style.opacity='.3'"/>
+            <span class="col-badge col-badge--new">New</span>
+            <span class="col-badge col-badge--ar" style="left:auto;right:10px">AR</span>
+            <div class="col-card-swatches">
+              <span class="col-card-swatch" style="background:#F5F3EE;outline:1px solid #ccc"></span>
+              <span class="col-card-swatch" style="background:#1C1A17"></span>
+              <span class="col-card-swatch" style="background:#7B6FA0"></span>
+            </div>
+            <div class="col-card-overlay"><span>Personalizar →</span></div>
+          </div>
+          <div>
+            <p class="col-card-nombre">Gloxinia</p>
+            <p class="col-card-sub">3 colores de fondo · 3 cortes</p>
+            <p class="col-card-cortes">✦ Regular · Oversize · Boxy</p>
+            <div class="col-card-tallas"><span>XS</span><span>S</span><span>M</span><span>L</span><span>XL</span></div>
+          </div>
+        </a>
+
+        <a href="detalle-disenio.html?id=4" class="col-card" data-diseño="head">
+          <div class="col-card-img">
+            <img src="assets/mockups/headblanco.png" alt="Head in the Clouds" onerror="this.style.opacity='.3'"/>
+            <div class="col-card-swatches">
+              <span class="col-card-swatch" style="background:#F5F3EE;outline:1px solid #ccc"></span>
+              <span class="col-card-swatch" style="background:#B0ADA8"></span>
+              <span class="col-card-swatch" style="background:#1C1A17"></span>
+            </div>
+            <div class="col-card-overlay"><span>Personalizar →</span></div>
+          </div>
+          <div>
+            <p class="col-card-nombre">Head in the Clouds</p>
+            <p class="col-card-sub">3 colores de fondo · 3 cortes</p>
+            <p class="col-card-cortes">✦ Regular · Oversize · Boxy</p>
+            <div class="col-card-tallas"><span>S</span><span>M</span><span>L</span><span>XL</span></div>
+          </div>
+        </a>
+
+        <a href="detalle-disenio.html?id=7" class="col-card" data-diseño="otros">
+          <div class="col-card-img">
+            <img src="assets/mockups/flyblanca.png" alt="Fly to the Sky" onerror="this.style.opacity='.3'"/>
+            <div class="col-card-swatches">
+              <span class="col-card-swatch" style="background:#F5F3EE;outline:1px solid #ccc"></span>
+              <span class="col-card-swatch" style="background:#1C1A17"></span>
+            </div>
+            <div class="col-card-overlay"><span>Personalizar →</span></div>
+          </div>
+          <div>
+            <p class="col-card-nombre">Fly to the Sky</p>
+            <p class="col-card-sub">2 colores de fondo · 3 cortes</p>
+            <p class="col-card-cortes">✦ Regular · Oversize · Boxy</p>
+            <div class="col-card-tallas"><span>XS</span><span>S</span><span>M</span><span>L</span><span>XL</span></div>
+          </div>
+        </a>
+
+        <a href="detalle-disenio.html?id=9" class="col-card" data-diseño="otros">
+          <div class="col-card-img">
+            <img src="assets/mockups/ballenablanco.png" alt="Ballena" onerror="this.style.opacity='.3'"/>
+            <span class="col-badge col-badge--ar">AR</span>
+            <div class="col-card-swatches">
+              <span class="col-card-swatch" style="background:#F5F3EE;outline:1px solid #ccc"></span>
+              <span class="col-card-swatch" style="background:#1C1A17"></span>
+            </div>
+            <div class="col-card-overlay"><span>Personalizar →</span></div>
+          </div>
+          <div>
+            <p class="col-card-nombre">Ballena</p>
+            <p class="col-card-sub">2 colores de fondo · 3 cortes</p>
+            <p class="col-card-cortes">✦ Regular · Oversize · Boxy</p>
+            <div class="col-card-tallas"><span>XS</span><span>S</span><span>M</span><span>L</span></div>
+          </div>
+        </a>
+
+        <a href="detalle-disenio.html?id=11" class="col-card" data-diseño="otros">
+          <div class="col-card-img">
+            <img src="assets/prendas/keepb-boxy.png" alt="Keep Learning" onerror="this.style.opacity='.3'"/>
+            <div class="col-card-swatches">
+              <span class="col-card-swatch" style="background:#F5F3EE;outline:1px solid #ccc"></span>
+              <span class="col-card-swatch" style="background:#1C1A17"></span>
+            </div>
+            <div class="col-card-overlay"><span>Personalizar →</span></div>
+          </div>
+          <div>
+            <p class="col-card-nombre">Keep Learning</p>
+            <p class="col-card-sub">2 colores de fondo · 3 cortes</p>
+            <p class="col-card-cortes">✦ Regular · Oversize · Boxy</p>
+            <div class="col-card-tallas"><span>XS</span><span>S</span><span>M</span><span>L</span><span>XL</span></div>
+          </div>
+        </a>
+
+        <a href="detalle-disenio.html?id=12" class="col-card" data-diseño="otros">
+          <div class="col-card-img">
+            <img src="assets/prendas/walkb-boxy.png" alt="Walk" onerror="this.style.opacity='.3'"/>
+            <div class="col-card-swatches">
+              <span class="col-card-swatch" style="background:#F5F3EE;outline:1px solid #ccc"></span>
+              <span class="col-card-swatch" style="background:#1C1A17"></span>
+            </div>
+            <div class="col-card-overlay"><span>Personalizar →</span></div>
+          </div>
+          <div>
+            <p class="col-card-nombre">Never Walk Alone</p>
+            <p class="col-card-sub">2 colores de fondo · 3 cortes</p>
+            <p class="col-card-cortes">✦ Regular · Oversize · Boxy</p>
+            <div class="col-card-tallas"><span>XS</span><span>S</span><span>M</span><span>L</span><span>XL</span></div>
+          </div>
+        </a>
+
+        <a href="detalle-disenio.html?id=13" class="col-card" data-diseño="otros">
+          <div class="col-card-img">
+            <img src="assets/prendas/geadb-boxy.png" alt="GEAD" onerror="this.style.opacity='.3'"/>
+            <div class="col-card-swatches">
+              <span class="col-card-swatch" style="background:#F5F3EE;outline:1px solid #ccc"></span>
+            </div>
+            <div class="col-card-overlay"><span>Personalizar →</span></div>
+          </div>
+          <div>
+            <p class="col-card-nombre">GEAD</p>
+            <p class="col-card-sub">1 color de fondo · 3 cortes</p>
+            <p class="col-card-cortes">✦ Regular · Oversize · Boxy</p>
+            <div class="col-card-tallas"><span>XS</span><span>S</span><span>M</span><span>L</span><span>XL</span></div>
+          </div>
+        </a>
+
+        <!-- <a href="detalle-disenio.html?id=14" class="col-card" data-diseño="rosa">
+          <div class="col-card-img">
+            <img src="assets/prendas/rosar-boxy.png" alt="Rosa Roja" onerror="this.style.opacity='.3'"/>
+            <div class="col-card-swatches">
+              <span class="col-card-swatch" style="background:#C0292E"></span>
+              <span class="col-card-swatch" style="background:#1C1A17"></span>
+            </div>
+            <div class="col-card-overlay"><span>Personalizar →</span></div>
+          </div>
+          <div>
+            <p class="col-card-nombre">Rosa Roja</p>
+            <p class="col-card-sub">2 colores de fondo · 3 cortes</p>
+            <p class="col-card-cortes">✦ Regular · Oversize · Boxy</p>
+            <div class="col-card-tallas"><span>XS</span><span>S</span><span>M</span><span>L</span><span>XL</span></div>
+          </div>
+        </a>-->
+
+      </div>
+    </div>
+
+    <div class="col-ar-banner">
+      <div class="col-ar-banner-inner">
+        <span class="col-ar-banner-pill">✦ Experiencia AR</span>
+        <p>Los diseños marcados con <strong>AR</strong> tienen Realidad Aumentada. Imprime el diseño y vélo cobrar vida ante tu cámara.</p>
+        <a href="disenios-ra.html" class="btn-ar-col">Explorar AR →</a>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════
+         SECCIÓN CAMISETAS PERSONALIZADAS
+    ═══════════════════════════════════════ -->
+    <section class="col-custom-section" id="personalizadas">
+      <div class="col-custom-header">
+        <p class="col-custom-eyebrow">✦ Prendas únicas</p>
+        <h2 class="col-custom-titulo">Camisetas Personalizadas</h2>
+        <p class="col-custom-desc">Diseños únicos creados a pedido por nuestra comunidad. Cada pieza es irrepetible — hecha con el diseño, color y corte que eligió su dueñ@.</p>
+      </div>
+
+      <div class="col-custom-grid" id="gridPersonalizadas">
+        <div class="col-custom-card">
+          <div class="col-custom-card-img">
+            <img src="assets/personalizadas/Mesa de trabajo 1 copia 4.png" alt="Personalizada 1" onerror="this.parentElement.style.background='#e8e4df'"/>
+          </div>
+          <div class="col-custom-card-body">
+            <span class="col-custom-card-tag">Pedido especial</span>
+            <p class="col-custom-card-titulo">Diseño Exclusivo</p>
+            <p class="col-custom-card-sub">Personalizada a pedido · Única</p>
+          </div>
+        </div>
+
+        <div class="col-custom-card">
+          <div class="col-custom-card-img">
+            <img src="assets/personalizadas/Mesa de trabajo 1 copia 7.png" alt="Personalizada 2" onerror="this.parentElement.style.background='#e8e4df'"/>
+          </div>
+          <div class="col-custom-card-body">
+            <span class="col-custom-card-tag">Pedido especial</span>
+            <p class="col-custom-card-titulo">Diseño Exclusivo</p>
+            <p class="col-custom-card-sub">Personalizada a pedido · Única</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-custom-cta">
+        <p style="font-family:var(--font-body);font-size:.85rem;color:var(--gray-400);margin-bottom:16px">
+          ¿Quieres la tuya? Elige diseño, color de fondo y corte — la hacemos para ti.
+        </p>
+        <a href="https://www.instagram.com/ivvi__design/" class="btn-custom-pedir" target="_blank">
+          Pedir la mía →
+        </a>
+      </div>
+    </section>
+
+  </div><!-- /sec-camisetas -->
+
+  <!-- BUZOS -->
+  <div class="col-seccion" id="sec-buzos">
+    <div class="col-pronto">
+      <div class="col-pronto-emoji">🧥</div>
+      <h2>Muy pronto</h2>
+      <p>Estamos trabajando en la colección de Buzos con los mismos diseños florales y experiencia AR.</p>
+      <button class="btn-volver-cam" onclick="switchTab('camisetas')">← Ver camisetas disponibles</button>
+    </div>
+  </div>
+
+  <footer class="col-footer">
+    <p>&copy; 2026 LOOK LAB IVVI · <a href="index.html">Volver al inicio</a></p>
+  </footer>
+
+</div>
+<script src="src/scripts/navbar.js"></script>
+<script>
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 10));
+
+  function switchTab(cat) {
+    document.querySelectorAll('.col-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.cat === cat);
+      t.setAttribute('aria-selected', t.dataset.cat === cat);
+    });
+    document.querySelectorAll('.col-seccion').forEach(s => {
+      s.classList.toggle('activa', s.id === 'sec-' + cat);
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.querySelectorAll('.col-tab').forEach(tab => {
+    tab.addEventListener('click', () => switchTab(tab.dataset.cat));
+  });
+
+  const cards = document.querySelectorAll('#gridCamisetas .col-card');
+  document.querySelectorAll('.col-filtro').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const f = btn.dataset.filter;
+      document.querySelectorAll('.col-filtro').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      let v = 0;
+      cards.forEach(card => {
+        const show = f === 'all' || card.dataset.diseño === f;
+        card.classList.toggle('oculta', !show);
+        if (show) v++;
+      });
+      document.getElementById('cnt-cam').textContent = v;
+      document.getElementById('totalPill').textContent = v + ' diseño' + (v !== 1 ? 's' : '');
+    });
+  });
+
+  const hash = window.location.hash.replace('#', '');
+  if (hash === 'buzos') switchTab('buzos');
+  if (hash === 'personalizadas') {
+    document.getElementById('personalizadas').scrollIntoView({ behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>

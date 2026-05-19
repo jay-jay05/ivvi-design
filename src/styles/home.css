@@ -1,0 +1,442 @@
+/* ============================================================
+   home.css — LOOK LAB IVVI · Artístico con Texturas
+   Hero centrado · Prendas primero · AR segundo · Probador tercero
+   ============================================================ */
+
+/* ════════════════════════════════════════
+   HERO — Centrado, con textura y protagonismo a las prendas
+════════════════════════════════════════ */
+.men {
+  background: var(--cream);
+  padding: var(--space-2xl) clamp(24px,6vw,120px) var(--space-xl);
+  min-height: 88vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+/* Fondo con gradientes de textura artística */
+.men::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 0%,   rgba(201,158,232,.18) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 15% 80%,   rgba(74,29,122,.08)  0%, transparent 50%),
+    radial-gradient(ellipse 50% 60% at 85% 70%,   rgba(139,68,192,.07) 0%, transparent 50%),
+    radial-gradient(ellipse 100% 30% at 50% 100%,  rgba(232,228,219,.6) 0%, transparent 60%);
+}
+
+/* Líneas ornamentales decorativas */
+.men::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, rgba(74,29,122,.25), transparent);
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Eyebrow animado */
+.hero-content::before {
+  content: 'Nueva Colección 2026';
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--purple-light);
+  background: var(--purple-tint);
+  border: 1px solid rgba(74,29,122,.14);
+  border-radius: var(--radius-pill);
+  padding: 5px 18px;
+  margin-bottom: var(--space-l);
+  animation: fadeUp .6s var(--ease-out) .05s both;
+}
+
+.hero-content h1 {
+  font-weight: 300;
+  color: var(--carbon);
+  line-height: 1.05;
+  margin-bottom: var(--space-m);
+  animation: fadeUp .7s var(--ease-out) .15s both;
+  letter-spacing: -.02em;
+}
+
+/* Palabra destacada en morado con subrayado artístico */
+.hero-content h1 span {
+  color: var(--purple);
+  position: relative;
+  display: inline-block;
+  font-style: italic;
+}
+.hero-content h1 span::after {
+  content: '';
+  position: absolute;
+  bottom: 4px; left: 0;
+  width: 100%; height: 2px;
+  background: linear-gradient(90deg, var(--purple-xlight), var(--purple-light));
+  border-radius: 1px;
+  opacity: .6;
+}
+
+.hero-content > p {
+  font-size: clamp(.95rem, 1.8vw, 1.1rem);
+  color: var(--gray-600);
+  line-height: 1.8;
+  max-width: 500px;
+  margin-bottom: var(--space-l);
+  animation: fadeUp .7s var(--ease-out) .25s both;
+}
+
+.hero-actions {
+  display: flex;
+  gap: var(--space-m);
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: fadeUp .7s var(--ease-out) .35s both;
+}
+
+/* CTA principal más grande */
+.hero-actions .btn-primary {
+  padding: 13px 32px;
+  font-size: 12px;
+}
+
+.hero-tooltip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--gray-400);
+  letter-spacing: .03em;
+  margin-top: var(--space-m);
+  animation: fadeUp .7s var(--ease-out) .45s both;
+}
+.hero-tooltip svg { flex-shrink:0; color:var(--purple-light); }
+
+/* Indicadores de confianza */
+.hero-trust {
+  display: flex;
+  align-items: center;
+  gap: var(--space-l);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: var(--space-l);
+  padding-top: var(--space-l);
+  border-top: 1px solid rgba(201,158,232,.2);
+  animation: fadeUp .7s var(--ease-out) .55s both;
+}
+.hero-trust-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  color: var(--gray-600);
+}
+.hero-trust-item svg { color: var(--purple-light); flex-shrink:0; }
+
+/* ════════════════════════════════════════
+   CARRUSEL
+════════════════════════════════════════ */
+.carousel-wrapper{position:relative;overflow:hidden;background:var(--cream-dark);max-height:600px}
+.carousel-track{display:flex;transition:transform .65s var(--ease-out)}
+.carousel-slide{min-width:100%;max-height:600px;overflow:hidden;display:flex;justify-content:center;align-items:center;background:var(--gray-100)}
+.carousel-slide img{width:100%;max-height:600px;object-fit:cover;display:block}
+.carousel-btn{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(250,249,246,.85);color:var(--carbon);border:1px solid var(--cream-mid);border-radius:50%;font-size:1rem;cursor:pointer;backdrop-filter:blur(8px);transition:background var(--dur-fast),color var(--dur-fast),transform var(--dur-fast);z-index:10}
+.carousel-btn:hover{background:var(--purple);color:var(--white);border-color:var(--purple);transform:translateY(-50%) scale(1.08)}
+.carousel-btn.prev{left:20px} .carousel-btn.next{right:20px}
+.carousel-dots{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:6px}
+.carousel-dot{width:6px;height:6px;border-radius:50%;background:rgba(28,26,23,.25);border:none;cursor:pointer;transition:background .25s,transform .25s}
+.carousel-dot.active{background:var(--purple);transform:scale(1.4)}
+
+/* ════════════════════════════════════════
+   AR SHOWCASE — segundo en protagonismo
+════════════════════════════════════════ */
+.ar-showcase{
+  grid-area:ar-showcase;
+  background:var(--carbon);
+  position:relative;overflow:hidden;
+}
+.ar-showcase::before{
+  content:'';
+  position:absolute;
+  top:-30%;right:-10%;
+  width:60vw;height:60vw;max-width:600px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(74,29,122,.2) 0%,transparent 70%);
+  pointer-events:none;
+}
+.ar-showcase::after{
+  content:'';
+  position:absolute;
+  bottom:-20%;left:-5%;
+  width:40vw;height:40vw;max-width:400px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(139,68,192,.1) 0%,transparent 70%);
+  pointer-events:none;
+}
+.ar-showcase-inner{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:var(--space-xl);align-items:center;
+  padding:var(--space-xl) clamp(24px,6vw,120px);
+  position:relative;z-index:1;
+}
+.ar-showcase-copy{display:flex;flex-direction:column;gap:var(--space-m)}
+.ar-showcase-pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-body);font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--purple-xlight);background:rgba(74,29,122,.35);border:1px solid rgba(201,158,232,.2);padding:5px 14px;border-radius:var(--radius-pill);width:fit-content}
+.ar-showcase-copy h2{font-family:var(--font-display);font-size:clamp(2rem,4vw,3.2rem);font-weight:300;color:var(--cream);line-height:1.1;letter-spacing:.01em}
+.ar-showcase-copy h2 em{font-style:italic;color:var(--purple-xlight)}
+.ar-showcase-copy > p{font-size:.95rem;color:rgba(250,249,246,.5);line-height:1.8;max-width:420px}
+.ar-showcase-steps{display:flex;align-items:center;gap:var(--space-s);flex-wrap:wrap;margin-top:var(--space-s)}
+.ar-step-mini{display:flex;align-items:center;gap:8px}
+.ar-step-mini-n{width:24px;height:24px;border:1.5px solid rgba(201,158,232,.4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--purple-xlight);flex-shrink:0}
+.ar-step-mini span{font-size:.78rem;color:rgba(250,249,246,.45);letter-spacing:.04em}
+.ar-step-mini-arrow{color:rgba(250,249,246,.2);font-size:.8rem}
+.ar-showcase-cta{display:inline-flex;align-items:center;gap:12px;width:fit-content;margin-top:var(--space-s);font-size:12px;padding:14px 32px}
+.ar-cta-pulse{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.6);flex-shrink:0;animation:pulse-btn 1.8s ease-in-out infinite}
+.ar-showcase-cards{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+.ar-mini-card{display:flex;flex-direction:column;overflow:hidden;text-decoration:none;position:relative;cursor:pointer;transition:transform var(--dur-mid) var(--ease-out)}
+.ar-mini-card:hover{transform:scale(1.02);z-index:2}
+.ar-mini-card-img{aspect-ratio:1;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.ar-mini-card--rosa .ar-mini-card-img{background:var(--rosa-light)}
+.ar-mini-card--sol  .ar-mini-card-img{background:var(--sol-light)}
+.ar-mini-card--glox .ar-mini-card-img{background:var(--glox-light)}
+.ar-mini-card-img img{width:80%;height:80%;object-fit:contain;transition:transform var(--dur-mid) var(--ease-out)}
+.ar-mini-card:hover .ar-mini-card-img img{transform:scale(1.08)}
+.ar-mini-card-body{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(28,26,23,.85);border-top:1px solid rgba(255,255,255,.06)}
+.ar-mini-label{font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(250,249,246,.35)}
+.ar-mini-card-body strong{font-family:var(--font-body);font-size:.78rem;font-weight:500;color:var(--cream);letter-spacing:.02em}
+.ar-mini-tag{font-size:9px;font-weight:700;letter-spacing:.1em;background:var(--purple);color:var(--white);padding:2px 7px;border-radius:var(--radius-pill)}
+.ar-mini-card--all{background:rgba(74,29,122,.15);border:1.5px solid rgba(201,158,232,.12);transition:background var(--dur-mid),border-color var(--dur-mid)}
+.ar-mini-card--all:hover{background:rgba(74,29,122,.28);border-color:rgba(201,158,232,.28);transform:none}
+.ar-mini-card-all-inner{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-m);padding:var(--space-l);color:rgba(250,249,246,.3);transition:color var(--dur-mid)}
+.ar-mini-card--all:hover .ar-mini-card-all-inner{color:var(--purple-xlight)}
+.ar-mini-card-all-inner span{font-size:.78rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;text-align:center;line-height:1.5}
+
+/* eyebrow texti */
+.texti-eyebrow{display:inline-block;font-family:var(--font-body);font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--purple-xlight);opacity:.6}
+
+/* ════════════════════════════════════════
+   ANIMACIONES
+════════════════════════════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* ════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════ */
+@media(max-width:900px){
+  .ar-showcase-inner{grid-template-columns:1fr;gap:var(--space-l)}
+  .ar-showcase-cards{grid-template-columns:repeat(4,1fr)}
+}
+@media(max-width:768px){
+  .men{padding:var(--space-xl) var(--space-l);min-height:auto}
+  .hero-actions{flex-direction:column;align-items:center}
+  .ar-showcase-cards{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:480px){
+  .ar-showcase-cards{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ════════════════════════════════════════
+   HERO — chips de prendas preview
+════════════════════════════════════════ */
+.hero-eyebrow {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 10px; font-weight: 600;
+  letter-spacing: .2em; text-transform: uppercase;
+  color: var(--purple-light);
+  background: var(--purple-tint);
+  border: 1px solid rgba(74,29,122,.14);
+  border-radius: var(--radius-pill);
+  padding: 5px 18px;
+  margin-bottom: var(--space-l);
+  animation: fadeUp .6s var(--ease-out) .05s both;
+}
+
+/* Anula el ::before del .men que duplicaría el eyebrow */
+.men .hero-content::before { display: none; }
+
+.hero-desc {
+  font-size: clamp(.95rem,1.8vw,1.1rem);
+  color: var(--gray-600);
+  line-height: 1.8;
+  max-width: 500px;
+  margin-bottom: var(--space-l);
+  animation: fadeUp .7s var(--ease-out) .25s both;
+}
+
+.hero-prendas-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-m);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: var(--space-l);
+  animation: fadeUp .7s var(--ease-out) .32s both;
+}
+.hero-prenda-chip {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--white);
+  border: 1.5px solid var(--cream-mid);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px 6px 8px;
+  text-decoration: none;
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast), transform var(--dur-fast);
+}
+.hero-prenda-chip:hover {
+  border-color: var(--purple-xlight);
+  box-shadow: 0 4px 16px rgba(74,29,122,.1);
+  transform: translateY(-2px);
+}
+.hero-prenda-chip-img {
+  width: 32px; height: 32px;
+  object-fit: contain; border-radius: 50%;
+  background: var(--cream-dark);
+  flex-shrink: 0;
+}
+.hero-prenda-chip-label {
+  font-family: var(--font-body);
+  font-size: 11.5px; font-weight: 500;
+  color: var(--carbon); letter-spacing: .02em;
+}
+.hero-prenda-chip-ar {
+  font-size: 8px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  background: var(--purple); color: var(--white);
+  padding: 2px 6px; border-radius: var(--radius-pill);
+}
+.hero-prenda-sep {
+  color: var(--gray-200);
+  font-size: 1.2rem; line-height: 1;
+  user-select: none;
+}
+
+.hero-tooltip {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--gray-400);
+  letter-spacing: .03em; margin-top: var(--space-m);
+  animation: fadeUp .7s var(--ease-out) .45s both;
+}
+.hero-tooltip svg { flex-shrink:0; color:var(--purple-light); }
+
+/* El h1 del hero con subrayado artístico */
+.men h1 { animation: fadeUp .7s var(--ease-out) .15s both; }
+.men h1 em { font-style: italic; color: var(--purple); font-weight: 300; }
+.men h1 span {
+  color: var(--purple);
+  position: relative; display: inline-block;
+}
+.men h1 span::after {
+  content: '';
+  position: absolute; bottom: 2px; left: 0;
+  width: 100%; height: 2px;
+  background: linear-gradient(90deg, var(--purple-xlight), var(--purple-light));
+  border-radius: 1px; opacity: .6;
+}
+
+.hero-actions { animation: fadeUp .7s var(--ease-out) .38s both; }
+.hero-actions .btn-primary { padding: 13px 32px; font-size: 12px; }
+
+/* ── Tipografía recta (override) ── */
+.nueva-col-copy h2 {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: clamp(1.4rem, 2.8vw, 2.2rem);
+  letter-spacing: -.02em;
+}
+.texti h2 {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+  letter-spacing: -.02em;
+}
+.ar-showcase-copy h2 {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  letter-spacing: -.03em;
+}
+
+/* ════════════════════════════════════════
+   BANNER TEXTURA FUTURISTA
+════════════════════════════════════════ */
+.hero-banner-texture {
+  width: 100%;
+  background: var(--cream);
+  position: relative;
+  overflow: hidden;
+  height: 130px;
+}
+.hbt-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.hbt-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hbt-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, var(--cream) 0%, transparent 20%, transparent 80%, var(--cream) 100%),
+    linear-gradient(to right,  var(--cream) 0%, transparent 8%,  transparent 92%, var(--cream) 100%);
+  pointer-events: none;
+}
+
+/* ── Hero h1 más recto (DM Sans en lugar de Cormorant) ── */
+.men h1 {
+  font-family: var(--font-body) !important;
+  font-weight: 800 !important;
+  font-size: clamp(2.4rem, 5.5vw, 4.2rem) !important;
+  letter-spacing: -.04em !important;
+  line-height: 1.0 !important;
+}
+.men h1 em {
+  font-style: normal !important;
+  font-weight: 800 !important;
+  color: var(--purple) !important;
+}
+.men h1 span {
+  color: var(--purple) !important;
+  font-style: normal !important;
+}
+.men h1 span::after {
+  height: 3px !important;
+  bottom: 0px !important;
+  opacity: .4 !important;
+}
+
+/* ── Hero eyebrow más recto ── */
+.hero-eyebrow {
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  letter-spacing: .22em !important;
+  border-radius: 2px !important;
+}
+
+/* ── Botones hero más rectos ── */
+.hero-actions .btn-primary,
+.hero-actions .btn-outline {
+  border-radius: 3px !important;
+}

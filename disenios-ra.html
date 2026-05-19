@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Diseños RA – LOOK LAB IVVI</title>
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="src/styles/main.css" />
+  <link rel="stylesheet" href="src/styles/navbar.css" />
+  <link rel="stylesheet" href="src/styles/disenios-ra.css" />
+</head>
+<body>
+<div id="app">
+
+  <!-- ══════════════════════════════════════
+       NAVBAR
+  ═══════════════════════════════════════ -->
+  <nav class="navbar" id="mainNav">
+    <a href="index.html">
+      <div class="brand-container">
+        <img src="src/assets/images/logo.png" class="brand-logo" alt="Logo">
+        <span class="brand-name">LOOK LAB IVVI</span>
+      </div>
+    </a>
+    <button class="navbar-toggle" id="navToggle"
+      aria-label="Abrir menú" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="navbar-links" id="navLinks">
+      <li><a href="index.html">Inicio</a></li>
+      <li><a href="coleccion.html">Colección</a></li>
+      <li><a href="probador.html">Probador Virtual</a></li>
+      <li><a href="disenios-ra.html" class="active">Diseños RA <span class="badge-ar">AR</span></a></li>
+    </ul>
+  </nav>
+
+  <!-- ══════════════════════════════════════
+       CABECERA
+  ═══════════════════════════════════════ -->
+  <header class="ra-header">
+    <div class="ra-header-ornament"></div>
+    <p class="ra-eyebrow">Realidad Aumentada · LOOK LAB IVVI</p>
+    <h1 class="ra-titulo">Diseños RA</h1>
+    <p class="ra-subtitulo">
+      Imprime el diseño, abre la experiencia<br>
+      y observa cómo cobra vida frente a tu cámara.
+    </p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:20px;font-family:var(--font-body);font-size:11px;color:var(--gray-400);letter-spacing:.04em;">
+      <span>✓ Sin apps</span>
+      <span style="color:var(--cream-mid)">·</span>
+      <span>✓ Sin instalación</span>
+      <span style="color:var(--cream-mid)">·</span>
+      <span>✓ Chrome &amp; Safari</span>
+      <span style="color:var(--cream-mid)">·</span>
+      <span>✓ Cámara no se graba</span>
+    </div>
+    <div class="ra-header-ornament"></div>
+  </header>
+
+  <!-- ══════════════════════════════════════
+       BARRA DE PASOS
+  ═══════════════════════════════════════ -->
+  <section class="ra-steps-global">
+
+    <div class="ra-step">
+      <div class="ra-step-n">1</div>
+      <div class="ra-step-body">
+        <strong>Imprime</strong>
+        <span>El diseño de tu prenda</span>
+      </div>
+    </div>
+
+    <div class="ra-step-divider"></div>
+
+    <div class="ra-step">
+      <div class="ra-step-n">2</div>
+      <div class="ra-step-body">
+        <strong>Activa</strong>
+        <span>La experiencia desde aquí</span>
+      </div>
+    </div>
+
+    <div class="ra-step-divider"></div>
+
+    <div class="ra-step">
+      <div class="ra-step-n">3</div>
+      <div class="ra-step-body">
+        <strong>Apunta</strong>
+        <span>La cámara a la imagen</span>
+      </div>
+    </div>
+
+    <div class="ra-step-divider"></div>
+
+    <div class="ra-step">
+      <div class="ra-step-n">4</div>
+      <div class="ra-step-body">
+        <strong>Vive</strong>
+        <span>La magia ✦</span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ══════════════════════════════════════
+       GALERÍA
+  ═══════════════════════════════════════ -->
+  <main class="ra-galeria">
+
+    <!-- ── Rosa ── -->
+    <article class="ra-card ra-card--rosa">
+      <div class="ra-card-image-wrap">
+        <img
+          src="src/assets/images/rosax.png"
+          alt="Diseño Rosa – AR"
+          class="ra-card-img"
+          onerror="this.parentElement.classList.add('no-img')"
+        />
+        <div class="ra-card-badge">AR</div>
+        <div class="ra-card-color-tag">
+          <span class="ra-color-dot" style="background:var(--rosa-accent)"></span>
+          Acentos en Rojo
+        </div>
+      </div>
+      <div class="ra-card-body">
+        <div class="ra-card-meta">
+          <span class="ra-card-label">Diseño 01</span>
+          <span class="ra-card-flor">Rosa</span>
+        </div>
+        <h2 class="ra-card-titulo">Colección Esencial</h2>
+        <p class="ra-card-desc">
+          Delicadeza y fuerza en un solo diseño. Apunta la cámara
+          a esta prenda impresa y observa la animación cobrar vida sobre ella.
+        </p>
+        <div class="ra-card-actions">
+          <a class="ra-card-cta" href="ar/ar-disenio1.html">
+            <span class="ra-cta-dot"></span>
+            Activar AR
+          </a>
+          <span class="ra-card-hint" data-tip="Necesitas imprimir el diseño primero">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ── Girasol ── -->
+    <article class="ra-card ra-card--sol">
+      <div class="ra-card-image-wrap">
+        <img
+          src="src/assets/images/girasolx.png"
+          alt="Diseño Girasol – AR"
+          class="ra-card-img"
+          onerror="this.parentElement.classList.add('no-img')"
+        />
+        <div class="ra-card-badge">AR</div>
+        <div class="ra-card-color-tag">
+          <span class="ra-color-dot" style="background:var(--sol-accent)"></span>
+          Acentos en Amarillo
+        </div>
+      </div>
+      <div class="ra-card-body">
+        <div class="ra-card-meta">
+          <span class="ra-card-label">Diseño 02</span>
+          <span class="ra-card-flor">Girasol</span>
+        </div>
+        <h2 class="ra-card-titulo">Edición Moderna</h2>
+        <p class="ra-card-desc">
+          Luz y energía en cada detalle. Descubre el contenido
+          oculto detrás de este diseño apuntando tu cámara.
+        </p>
+        <div class="ra-card-actions">
+          <a class="ra-card-cta" href="ar/ar-disenio2.html">
+            <span class="ra-cta-dot"></span>
+            Activar AR
+          </a>
+          <span class="ra-card-hint" data-tip="Necesitas imprimir el diseño primero">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+    </article>
+
+    <!-- ── Gloxinia ── -->
+    <article class="ra-card ra-card--glox">
+      <div class="ra-card-image-wrap">
+        <img
+          src="src/assets/images/gloxiniax.png"
+          alt="Diseño Gloxinia – AR"
+          class="ra-card-img"
+          onerror="this.parentElement.classList.add('no-img')"
+        />
+        <div class="ra-card-badge">AR</div>
+        <div class="ra-card-color-tag">
+          <span class="ra-color-dot"
+            style="background:linear-gradient(135deg,var(--glox-accent),var(--purple-mid))">
+          </span>
+          Acentos en Morado
+        </div>
+      </div>
+      <div class="ra-card-body">
+        <div class="ra-card-meta">
+          <span class="ra-card-label">Diseño 03</span>
+          <span class="ra-card-flor">Gloxinia</span>
+        </div>
+        <h2 class="ra-card-titulo">Elegancia Contemporánea</h2>
+        <p class="ra-card-desc">
+          Misterio y sofisticación en degradado de morado. Una experiencia
+          visual que transforma tu prenda en arte interactivo.
+        </p>
+        <div class="ra-card-actions">
+          <a class="ra-card-cta" href="ar/ar-disenio3.html">
+            <span class="ra-cta-dot"></span>
+            Activar AR
+          </a>
+          <span class="ra-card-hint" data-tip="Necesitas imprimir el diseño primero">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+    </article>
+
+  </main><!-- /.ra-galeria -->
+
+  <!-- ══════════════════════════════════════
+       CÓMO FUNCIONA
+  ═══════════════════════════════════════ -->
+  <section class="ra-como" id="como-funciona">
+    <div class="ra-como-inner">
+      <span class="ra-como-label">Tecnología</span>
+      <h2>¿Cómo funciona?</h2>
+      <p>
+        Cada diseño tiene un <strong>target</strong> único — la imagen actúa como
+        marcador visual. La cámara lo detecta en tiempo real y superpone contenido
+        multimedia directamente sobre la prenda usando <strong>MindAR + A-Frame</strong>,
+        sin instalar ninguna app.
+      </p>
+      <p>
+        Solo necesitas un <strong>navegador moderno</strong> (Chrome o Safari) y
+        buena iluminación para que el reconocimiento funcione correctamente.
+      </p>
+      <div class="ra-como-tags">
+        <span>Sin app</span>
+        <span>Sin instalación</span>
+        <span>Tiempo real</span>
+        <span>IA tracking</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       BANNER → PROBADOR VIRTUAL
+  ═══════════════════════════════════════ -->
+  <div class="ra-probador-banner">
+    <div class="ra-probador-banner-content">
+      <span class="ra-como-label">También disponible</span>
+      <p>
+        ¿Quieres verte con las prendas <strong>ahora mismo</strong>,
+        sin imprimir nada? Usa el Probador Virtual con tu cámara.
+      </p>
+      <a href="probador.html" class="btn-outline"
+        style="border-color:rgba(255,255,255,.25); color:var(--cream);">
+        Ir al Probador Virtual →
+      </a>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════ -->
+  <footer class="ra-footer">
+    <p>&copy; 2025 LOOK LAB IVVI · <a href="index.html">Volver al inicio</a></p>
+  </footer>
+
+</div><!-- /#app -->
+
+<!-- Scripts -->
+<script src="src/scripts/navbar.js"></script>
+<script>
+  /* Sombra en navbar al hacer scroll */
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () =>
+    nav.classList.toggle('scrolled', window.scrollY > 10)
+  );
+</script>
+</body>
+</html>

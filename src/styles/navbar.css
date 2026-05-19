@@ -1,0 +1,78 @@
+/* ============================================================
+   navbar.css — LOOK LAB IVVI · Artístico
+   ============================================================ */
+
+.navbar{
+  position:fixed;top:0;left:0;width:100%;z-index:1000;
+  background:rgba(250,249,246,.88);
+  backdrop-filter:blur(18px) saturate(180%);
+  -webkit-backdrop-filter:blur(18px) saturate(180%);
+  border-bottom:1px solid rgba(232,228,219,.7);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 clamp(16px,3.5vw,56px);
+  height:62px;
+  transition:box-shadow .3s, background .3s;
+}
+.navbar.scrolled{
+  background:rgba(250,249,246,.96);
+  box-shadow:0 2px 24px rgba(28,26,23,.07);
+}
+
+/* Efecto sutil de textura en navbar */
+.navbar::after{
+  content:'';
+  position:absolute;inset:0;
+  pointer-events:none;
+  opacity:.018;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:180px 180px;
+}
+
+.brand-logo{height:32px;width:auto;object-fit:contain;display:block;transition:opacity .2s}
+.brand-logo:hover{opacity:.8}
+.brand-container{display:flex;align-items:center;gap:9px;cursor:pointer;text-decoration:none;position:relative;z-index:1}
+.brand-name{font-family:var(--font-display);font-size:1.05rem;font-weight:400;letter-spacing:.08em;color:var(--carbon);transition:color var(--dur-fast)}
+.brand-container:hover .brand-name{color:var(--purple)}
+
+.navbar-links{display:flex;gap:2rem;align-items:center;position:relative;z-index:1}
+.navbar-links a{font-family:var(--font-body);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-600);padding:3px 0;position:relative;transition:color var(--dur-fast)}
+.navbar-links a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1.5px;background:var(--purple);transition:width var(--dur-mid) var(--ease-out)}
+.navbar-links a:hover,.navbar-links a.active{color:var(--purple)}
+.navbar-links a:hover::after,.navbar-links a.active::after{width:100%}
+
+/* Link de Contacto — destacado */
+.navbar-links a.nav-contacto {
+  color: var(--purple);
+  background: var(--purple-tint);
+  border: 1px solid rgba(74,29,122,.18);
+  border-radius: var(--radius-pill);
+  padding: 5px 14px;
+  font-size: 10.5px;
+  transition: background var(--dur-fast), border-color var(--dur-fast), transform var(--dur-fast);
+}
+.navbar-links a.nav-contacto::after { display:none; }
+.navbar-links a.nav-contacto:hover {
+  background: var(--purple);
+  color: var(--white);
+  border-color: var(--purple);
+  transform: translateY(-1px);
+}
+
+.badge-ar{font-size:8px;font-weight:700;letter-spacing:.06em;background:var(--purple);color:var(--white);padding:2px 5px;border-radius:var(--radius-pill);margin-left:4px;vertical-align:middle;transition:background var(--dur-fast)}
+.navbar-links a:hover .badge-ar{background:var(--purple-mid)}
+
+.navbar-toggle{display:none;flex-direction:column;gap:4px;padding:5px;border-radius:var(--radius-s);transition:background var(--dur-fast);position:relative;z-index:1}
+.navbar-toggle:hover{background:var(--gray-100)}
+.navbar-toggle span{display:block;width:20px;height:1.5px;background:var(--carbon);border-radius:2px;transition:transform .3s var(--ease-out),opacity .3s}
+.navbar-toggle[aria-expanded="true"] span:nth-child(1){transform:translateY(5.5px) rotate(45deg)}
+.navbar-toggle[aria-expanded="true"] span:nth-child(2){opacity:0}
+.navbar-toggle[aria-expanded="true"] span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
+
+@media(max-width:768px){
+  .navbar-toggle{display:flex}
+  .navbar-links{display:none;flex-direction:column;gap:0;position:absolute;top:62px;left:0;width:100%;background:rgba(250,249,246,.98);backdrop-filter:blur(14px);border-bottom:1px solid var(--cream-mid);padding:.4rem 0;box-shadow:var(--shadow-m)}
+  .navbar-links.open{display:flex}
+  .navbar-links a{display:block;padding:12px clamp(16px,4vw,36px);font-size:.82rem;border-bottom:1px solid var(--gray-100)}
+  .navbar-links a::after{display:none}
+  .navbar-links a.nav-contacto{margin:8px clamp(16px,4vw,36px);border-radius:var(--radius-m);text-align:center;padding:10px}
+}
