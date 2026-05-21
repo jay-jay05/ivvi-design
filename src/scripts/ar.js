@@ -28,7 +28,7 @@ const DISEÑOS = [
     coleccion:   'Diseño 01 · Colección Esencial',
     emoji:       '🌹',
     color:       '#E8374A',
-    escala:      '5 5 5',
+    escala:      '0.4 0.4 0.4',
     descripcion: [
       `<span class="capital">L</span>a <em>rosa</em> ha sido símbolo de elegancia y pasión
        a lo largo de los siglos. En esta colección la reinterpretamos bajo un concepto
@@ -44,7 +44,7 @@ const DISEÑOS = [
     coleccion:   'Diseño 02 · Edición Moderna',
     emoji:       '🌻',
     color:       '#E8A020',
-    escala:      '5.0 5.0 5.0',
+    escala:      '0.4 0.4 0.4',
     descripcion: [
       `<span class="capital">E</span>l <em>girasol</em> siempre mira hacia la luz. Este diseño
        captura esa energía vital y la transforma en una pieza que irradia calidez en cada hilo.`,
@@ -59,7 +59,7 @@ const DISEÑOS = [
     coleccion:   'Diseño 03 · Elegancia Contemporánea',
     emoji:       '🌸',
     color:       '#8B44C0',
-    escala:      '5.0 5.0 5.0',
+    escala:      '0.4 0.4 0.4',
     descripcion: [
       `<span class="capital">L</span>a <em>gloxinia</em> florece en sombra y en silencio.
        Su belleza es discreta, profunda — la de quien no necesita anunciarse para ser recordado.`,
@@ -74,7 +74,7 @@ const DISEÑOS = [
     coleccion:   'Diseño 04 · Edición Mar',
     emoji:       '🐋',
     color:       '#2A7FCC',
-    escala:      '5.0 5.0 5.0',
+    escala:      '0.4 0.4 0.4',
     descripcion: [
       `<span class="capital">L</span>a <em>ballena</em> navega en silencio por aguas profundas.
        Este diseño captura esa majestuosidad marina: imponente, serena, sin artificio.`,
@@ -89,7 +89,7 @@ const DISEÑOS = [
     coleccion:   'Diseño 05 · Edición Urbana',
     emoji:       '🦋',
     color:       '#4DAA70',
-    escala:      '5.0 5.0 5.0',
+    escala:      '0.4 0.4 0.4',
     descripcion: [
       `<span class="capital">V</span>olar es una forma de ver el mundo desde otro ángulo.
        La colección <em>Fly</em> nace de esa libertad: diseño limpio, actitud sin límites.`,
