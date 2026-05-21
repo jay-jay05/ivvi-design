@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Realidad Aumentada – LOOK LAB IVVI</title>
+
+  <!--
+    ════════════════════════════════════════════════════════
+    DEPENDENCIAS EXTERNAS
+    ════════════════════════════════════════════════════════
+  -->
+  <!-- A-Frame 3D engine -->
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <!-- MindAR (image tracking core + integración A-Frame) -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <!--
+    ════════════════════════════════════════════════════════
+    ESTILOS — todo en ar.css, sin estilos inline en este HTML
+    ════════════════════════════════════════════════════════
+  -->
+  <link rel="stylesheet" href="../src/styles/ar.css" />
+
+  <!--
+    Service Worker para SharedArrayBuffer (requerido por MindAR).
+    Si acaba de instalarse, recarga la página para aplicar los headers.
+  -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('../coi-serviceworker.js')
+        .then(reg => {
+          if (reg.installing) {
+            reg.installing.addEventListener('statechange', e => {
+              if (e.target.state === 'activated') location.reload();
+            });
+          }
+        })
+        .catch(err => console.warn('[SW]', err));
+    }
+  </script>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════
+     SPLASH — pantalla de inicio antes de activar la cámara
+════════════════════════════════════════════════════════ -->
+<div id="overlay-inicio">
+  <div class="splash-ornamento"></div>
+  <p class="splash-eyebrow">Realidad Aumentada · LOOK LAB IVVI</p>
+  <div class="splash-icono">✦</div>
+  <h1 class="splash-titulo">Todos los<br>diseños</h1>
+  <p class="splash-subtitulo">Realidad Aumentada</p>
+  <p class="splash-desc">
+    Apunta la cámara a cualquiera de los marcadores impresos
+    y el modelo 3D de esa camiseta aparecerá ante tus ojos.
+  </p>
+
+  <!--
+    Los chips de diseños se generan automáticamente desde
+    el array DISEÑOS en ar.js — no hace falta editarlos aquí.
+  -->
+  <div id="splash-markers" class="splash-markers"></div>
+
+  <button id="btn-iniciar">
+    <span class="btn-dot"></span>
+    Activar cámara
+  </button>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     LOADING — visible mientras MindAR inicializa
+════════════════════════════════════════════════════════ -->
+<div id="overlay-loading">
+  <div class="loading-ring">
+    <div class="loading-spinner"></div>
+  </div>
+  <p class="loading-txt">Cargando marcadores…</p>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     ERROR — si no se puede acceder a la cámara
+════════════════════════════════════════════════════════ -->
+<div id="overlay-error">
+  <div class="error-icon">📷</div>
+  <h2 class="error-titulo">No se pudo acceder<br>a la cámara</h2>
+  <p class="error-desc">Posibles causas:</p>
+  <ul class="error-lista">
+    <li>El navegador bloqueó el permiso de cámara</li>
+    <li>La página no se sirve desde HTTPS o localhost</li>
+    <li>Otra aplicación está usando la cámara</li>
+    <li>El dispositivo no tiene cámara trasera</li>
+  </ul>
+  <p class="error-nota">
+    <strong>Solución:</strong>
+    Icono de candado en la barra del navegador → Cámara → Permitir → Recargar.
+  </p>
+  <button class="btn-reintentar" onclick="reintentar()">🔄 Reintentar</button>
+  <button class="btn-volver-err" onclick="history.back()">← Volver</button>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     HUD AR — capa de UI superpuesta a la cámara
+════════════════════════════════════════════════════════ -->
+<div id="overlay-ar">
+
+  <!-- Botón volver -->
+  <a href="../disenios-ra.html" id="btn-volver">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+    Volver
+  </a>
+
+  <!-- Tag: nombre del diseño detectado (esquina sup. derecha) -->
+  <div id="hud-tag"></div>
+
+  <!-- Badge central al detectar un target -->
+  <div id="badge-activo"></div>
+
+  <!-- Hint "toca para saber más" -->
+  <div id="hint-tap">Toca para saber más</div>
+
+  <!-- Marco de escaneo animado -->
+  <div id="scan-frame">
+    <div class="c3"></div>
+    <div class="c4"></div>
+    <div class="scan-line"></div>
+  </div>
+
+  <!-- Prompt inferior -->
+  <div id="scan-prompt">
+    <span class="dot"></span>
+    Apunta a cualquier diseño
+  </div>
+
+</div><!-- /#overlay-ar -->
+
+
+<!-- ════════════════════════════════════════════════════════
+     SELECTOR DE CÁMARA — trasera / frontal
+════════════════════════════════════════════════════════ -->
+<div id="cam-selector">
+  <button class="cam-btn activa" id="btn-cam-trasera">
+    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+      <circle cx="12" cy="13" r="4"/>
+    </svg>
+    Trasera
+  </button>
+  <button class="cam-btn" id="btn-cam-frontal">
+    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="4"/>
+      <path d="M2 12h3M17 12h3M12 2v3M12 17v3"/>
+    </svg>
+    Selfie
+  </button>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     ZONA TAP — área invisible clickeable sobre el modelo 3D
+════════════════════════════════════════════════════════ -->
+<div id="zona-tap"></div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     PANEL INFO — bottom sheet con info editorial del diseño
+════════════════════════════════════════════════════════ -->
+<div id="overlay-info">
+  <div class="panel-info">
+    <div class="panel-handle"></div>
+    <div class="panel-ornamento"><span>✦</span></div>
+    <p class="panel-etiqueta" id="panel-etiqueta-txt"></p>
+    <h2 class="panel-titulo"  id="panel-titulo-txt"></h2>
+    <div class="panel-divider"><span>❧</span></div>
+    <div class="panel-texto"  id="panel-cuerpo-txt"></div>
+    <p class="panel-cierre">LOOK LAB IVVI · 2026</p>
+    <button class="btn-cerrar-info" id="btn-cerrar-info">Cerrar</button>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════
+     ESCENA A-FRAME / MINDAR
+
+     · Un solo archivo .mind con TODOS los targets.
+     · Para compilarlo: https://hiukim.github.io/mind-ar-js-doc/tools/compile
+       Sube los marcadores en este orden exacto:
+         0 → Rosa     (markers/rosa.png)
+         1 → Girasol  (markers/girasol.png)
+         2 → Gloxinia (markers/glox.png)
+         3 → Ballena  (markers/ballena.png)
+         4 → Fly      (markers/fly.png)
+       Descarga el .mind y guárdalo como targets/targets-todos.mind
+
+     · maxTrack: 1 — rastrea de a un target por vez (mejor rendimiento).
+       Si quieres que detecte varios simultáneamente, aumenta este valor.
+════════════════════════════════════════════════════════ -->
+<a-scene
+  id="escena-ar"
+  mindar-image="
+    imageTargetSrc: targets/targets-todos.mind;
+    maxTrack: 1;
+    uiLoading: no;
+    uiScanning: no;
+    uiError: no;
+    filterMinCF: 0.001;
+    filterBeta: 0.01;
+    warmupTolerance: 5;
+    missTolerance: 5
+  "
+  color-space="sRGB"
+  renderer="colorManagement: true; physicallyCorrectLights: true"
+  vr-mode-ui="enabled: false"
+  device-orientation-permission-ui="enabled: false"
+>
+
+  <!-- ── Assets — modelos GLB ── -->
+  <a-assets>
+    <!--
+      Rutas relativas desde /ar/ hacia /ar/models/
+      Nombres de archivo = nombre del diseño en minúsculas.
+    -->
+    <a-asset-item id="model-rosa"     src="models/rosa.glb"></a-asset-item>
+    <a-asset-item id="model-girasol"  src="models/girasol.glb"></a-asset-item>
+    <a-asset-item id="model-gloxinia" src="models/glox.glb"></a-asset-item>
+    <a-asset-item id="model-ballena"  src="models/ballena.glb"></a-asset-item>
+    <a-asset-item id="model-fly"      src="models/fly.glb"></a-asset-item>
+    <!--
+      NUEVO DISEÑO → agrega aquí:
+      <a-asset-item id="model-NOMBRE" src="models/NOMBRE.glb"></a-asset-item>
+    -->
+  </a-assets>
+
+  <!-- ── Cámara ── -->
+  <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+  <!-- ── Luces ── -->
+  <a-light type="ambient"     color="#ffffff" intensity="0.7"></a-light>
+  <a-light type="directional" color="#fff8f0" intensity="1.0" position="1 2 2"></a-light>
+  <a-light type="directional" color="#f0f0ff" intensity="0.3" position="-2 1 -1"></a-light>
+
+  <!--
+    ════════════════════════════════════════════════════════
+    TARGETS — uno por diseño
+    · id="target-N"  →  N = posición en el array DISEÑOS de ar.js
+    · targetIndex: N →  N = posición en el archivo .mind compilado
+    · Los modelos arrancan con scale="0 0 0" y animan al detectarse.
+    ════════════════════════════════════════════════════════
+  -->
+
+  <!--
+    ESTRUCTURA DE CADA TARGET:
+    · <a-entity mindar-image-target>  → anclado al marcador (no tocar)
+      └─ <a-entity id="pivot-N">      → controla posición Y y la animación de float
+           └─ <a-gltf-model>          → rotation="-90 0 0" para que la camiseta quede parada
+                                         scale maneja el aparecer elástico
+
+    Por qué el pivot:
+    - El marcador de MindAR trabaja en el plano XZ (la mesa).
+    - "Y" en ese sistema es "hacia arriba", perpendicular al marcador.
+    - Ponemos position="0 0.15 0" en el pivot para que la base
+      de la camiseta arranque justo sobre el marcador.
+    - La animación de float mueve el pivot de 0.15 a 0.18 (3 cm virtuales),
+      dando la sensación de levitar sin despegarse visualmente.
+    - rotation="-90 0 0" en el modelo convierte el eje Y del GLB
+      (que apunta al frente) en el eje Z de A-Frame (que apunta hacia arriba),
+      haciendo que la camiseta quede erguida.
+  -->
+
+  <!-- 0 · Rosa -->
+  <a-entity mindar-image-target="targetIndex: 0" id="target-0">
+    <a-entity id="pivot-0" position="0 0.15 0"
+      animation__flotar="property:position; from:0 0.15 0; to:0 0.18 0; dur:2400; easing:easeInOutSine; loop:true; dir:alternate">
+      <a-gltf-model
+        src="#model-rosa"
+        rotation="90 0 0"
+        position="0 0 0"
+        scale="5.0 5.0 5.0"
+        animation__aparecer="property:scale; from:0 0 0; to:0.09 0.09 0.09; dur:600; easing:easeOutElastic; startEvents:model-aparecer"
+      ></a-gltf-model>
+    </a-entity>
+  </a-entity>
+
+  <!-- 1 · Girasol -->
+  <a-entity mindar-image-target="targetIndex: 1" id="target-1">
+    <a-entity id="pivot-1" position="0 0.15 0"
+      animation__flotar="property:position; from:0 0.15 0; to:0 0.18 0; dur:2200; easing:easeInOutSine; loop:true; dir:alternate">
+      <a-gltf-model
+        src="#model-girasol"
+        rotation="90 0 0"
+        position="0 0 0"
+        scale="0 0 0"
+        animation__aparecer="property:scale; from:0 0 0; to:0.09 0.09 0.09; dur:600; easing:easeOutElastic; startEvents:model-aparecer"
+      ></a-gltf-model>
+    </a-entity>
+  </a-entity>
+
+  <!-- 2 · Gloxinia -->
+  <a-entity mindar-image-target="targetIndex: 2" id="target-2">
+    <a-entity id="pivot-2" position="0 0.15 0"
+      animation__flotar="property:position; from:0 0.15 0; to:0 0.18 0; dur:2600; easing:easeInOutSine; loop:true; dir:alternate">
+      <a-gltf-model
+        src="#model-gloxinia"
+        rotation="90 0 0"
+        position="0 0 0"
+        scale="0 0 0"
+        animation__aparecer="property:scale; from:0 0 0; to:0.09 0.09 0.09; dur:600; easing:easeOutElastic; startEvents:model-aparecer"
+      ></a-gltf-model>
+    </a-entity>
+  </a-entity>
+
+  <!-- 3 · Ballena -->
+  <a-entity mindar-image-target="targetIndex: 3" id="target-3">
+    <a-entity id="pivot-3" position="0 0.15 0"
+      animation__flotar="property:position; from:0 0.15 0; to:0 0.18 0; dur:2800; easing:easeInOutSine; loop:true; dir:alternate">
+      <a-gltf-model
+        src="#model-ballena"
+        rotation="90 0 0"
+        position="0 0 0"
+        scale="0 0 0"
+        animation__aparecer="property:scale; from:0 0 0; to:0.09 0.09 0.09; dur:600; easing:easeOutElastic; startEvents:model-aparecer"
+      ></a-gltf-model>
+    </a-entity>
+  </a-entity>
+
+  <!-- 4 · Fly -->
+  <a-entity mindar-image-target="targetIndex: 4" id="target-4">
+    <a-entity id="pivot-4" position="0 0.15 0"
+      animation__flotar="property:position; from:0 0.15 0; to:0 0.18 0; dur:2100; easing:easeInOutSine; loop:true; dir:alternate">
+      <a-gltf-model
+        src="#model-fly"
+        rotation="90 0 0"
+        position="0 0 0"
+        scale="0 0 0"
+        animation__aparecer="property:scale; from:0 0 0; to:0.09 0.09 0.09; dur:600; easing:easeOutElastic; startEvents:model-aparecer"
+      ></a-gltf-model>
+    </a-entity>
+  </a-entity>
+
+  <!--
+    ╔══════════════════════════════════════════════════════╗
+    ║  PARA AGREGAR UN NUEVO DISEÑO:                      ║
+    ║                                                      ║
+    ║  1. Agrega el marcador PNG en  ar/markers/           ║
+    ║  2. Agrega el modelo GLB en    ar/models/            ║
+    ║  3. Recompila targets-todos.mind con la nueva imagen ║
+    ║     → https://hiukim.github.io/mind-ar-js-doc/tools/compile
+    ║  4. Agrega <a-asset-item> arriba (en <a-assets>)    ║
+    ║  5. Copia un bloque <a-entity> y ajusta:            ║
+    ║     · id="target-N"  (N = índice siguiente)         ║
+    ║     · targetIndex: N                                 ║
+    ║     · src="#model-NOMBRE"                            ║
+    ║  6. Agrega el objeto en el array DISEÑOS en ar.js   ║
+    ╚══════════════════════════════════════════════════════╝
+
+    NUEVO DISEÑO → copia y pega esto:
+
+    <a-entity mindar-image-target="targetIndex: 5" id="target-5">
+      <a-gltf-model
+        src="#model-NOMBRE"
+        position="0 0 0"
+        scale="0 0 0"
+        animation__aparecer="property:scale; from:0 0 0; to:0.09 0.09 0.09; dur:600; easing:easeOutElastic; startEvents:model-aparecer"
+        animation__flotar="property:position; from:0 0 0; to:0 0.02 0; dur:2300; easing:easeInOutSine; loop:true; dir:alternate"
+      ></a-gltf-model>
+    </a-entity>
+  -->
+
+</a-scene>
+
+
+<!-- ════════════════════════════════════════════════════════
+     LÓGICA — todo en src/scripts/ar.js
+════════════════════════════════════════════════════════ -->
+<script src="../src/scripts/ar.js"></script>
+
+</body>
+</html>

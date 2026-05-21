@@ -2,698 +2,935 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Realidad Aumentada · IVVI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>AR Unificado – LOOK LAB IVVI</title>
 
-  <!-- MindAR + A-Frame -->
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image.prod.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Archivo:wght@300;400;500&display=swap" rel="stylesheet" />
-
   <style>
-    /* ── Reset & tokens ── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
 
-    :root {
-      --gold:   #E8A020;
-      --gold-lt:#F5C76A;
-      --ink:    #1A1208;
-      --cream:  #FBF7F0;
-      --gray:   #6B6050;
-      --radius: 12px;
-    }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: transparent !important;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
 
-    html, body {
-      width: 100%; height: 100%;
-      font-family: 'Archivo', sans-serif;
-      background: var(--ink);
-      color: var(--cream);
-      overflow-x: hidden;
-    }
+.a-enter-vr, .a-enter-ar, .a-enter-vr-button, [data-a-enter-vr-button] { display: none !important; }
 
-    /* ── Hero / intro ── */
-    .hero {
-      position: relative;
-      min-height: 100svh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 24px 40px;
-      text-align: center;
-      overflow: hidden;
-    }
+canvas {
+  position: fixed !important;
+  top: 0 !important; left: 0 !important;
+  width: 100% !important; height: 100% !important;
+  z-index: 1 !important;
+  display: block !important;
+}
 
-    .hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse 70% 55% at 50% 0%, rgba(232,160,32,.18) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 30% at 80% 90%, rgba(232,160,32,.10) 0%, transparent 60%);
-      pointer-events: none;
-    }
+/* ── SPLASH ── */
+#overlay-inicio {
+  position: fixed; inset: 0; z-index: 999;
+  background: #0D0C0A;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 32px; text-align: center;
+  transition: opacity .5s ease;
+}
+#overlay-inicio.saliendo { opacity: 0; pointer-events: none; }
+#overlay-inicio.oculto   { display: none; }
+#overlay-inicio::before {
+  content: '';
+  position: absolute; top: -20%; left: 50%;
+  transform: translateX(-50%);
+  width: 70vw; height: 70vw;
+  max-width: 520px; max-height: 520px;
+  border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(201,158,232,.18) 0%, transparent 70%);
+}
 
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid rgba(232,160,32,.35);
-      border-radius: 100px;
-      padding: 6px 18px;
-      font-size: .72rem;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: var(--gold-lt);
-      margin-bottom: 28px;
-      backdrop-filter: blur(6px);
-    }
-    .hero-badge span { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: pulse 2s ease-in-out infinite; }
+.splash-ornamento {
+  width: 32px; height: 1px;
+  background: rgba(201,158,232,.4);
+  margin: 0 auto 28px;
+}
+.splash-eyebrow {
+  font-size: 9px; font-weight: 600;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: #C99EE8; margin-bottom: 16px; opacity: .8;
+}
+.splash-icono {
+  font-size: 52px; margin-bottom: 20px;
+  animation: float 3.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 24px rgba(201,158,232,.3));
+}
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
 
-    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+.splash-titulo {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1.9rem, 8vw, 2.8rem); font-weight: 300;
+  letter-spacing: .04em; color: #FAF9F6;
+  line-height: 1.1; margin-bottom: 8px;
+}
+.splash-subtitulo {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: .95rem; font-style: italic; font-weight: 300;
+  color: #C99EE8; letter-spacing: .06em; margin-bottom: 14px;
+}
+.splash-desc {
+  font-size: 13px; line-height: 1.7;
+  color: rgba(250,249,246,.38); max-width: 280px;
+  margin: 0 auto 36px;
+}
 
-    .hero h1 {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 300;
-      font-size: clamp(2.6rem, 8vw, 5.2rem);
-      line-height: 1.08;
-      letter-spacing: -.01em;
-      color: var(--cream);
-      margin-bottom: 20px;
-    }
-    .hero h1 em { color: var(--gold); font-style: italic; }
+/* Marcadores mini en splash */
+.splash-markers {
+  display: flex; gap: 12px; justify-content: center;
+  margin-bottom: 32px; flex-wrap: wrap;
+}
+.splash-marker-chip {
+  display: flex; align-items: center; gap: 7px;
+  background: rgba(250,249,246,.06);
+  border: 1px solid rgba(201,158,232,.2);
+  border-radius: 999px; padding: 5px 12px;
+  font-size: 10px; color: rgba(250,249,246,.55);
+  letter-spacing: .05em;
+}
+.splash-marker-chip .dot-color {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
 
-    .hero p {
-      max-width: 480px;
-      font-size: .95rem;
-      line-height: 1.7;
-      color: rgba(251,247,240,.65);
-      margin-bottom: 48px;
-    }
+#btn-iniciar {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 15px 40px;
+  background: #C99EE8; color: #0D0C0A;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  border: none; border-radius: 2px; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity .2s, transform .2s;
+}
+#btn-iniciar:active { opacity: .8; transform: scale(.98); }
 
-    /* ── Instruction steps ── */
-    .steps {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 52px;
-    }
-    .step {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(232,160,32,.15);
-      border-radius: var(--radius);
-      padding: 14px 18px;
-      max-width: 200px;
-      text-align: left;
-    }
-    .step-num {
-      width: 26px; height: 26px; flex-shrink: 0;
-      border-radius: 50%;
-      border: 1px solid var(--gold);
-      display: flex; align-items: center; justify-content: center;
-      font-size: .7rem;
-      color: var(--gold);
-      font-weight: 500;
-    }
-    .step p { font-size: .8rem; line-height: 1.5; color: rgba(251,247,240,.7); }
+.btn-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(13,12,10,.5);
+  animation: pulso 1.8s ease-in-out infinite;
+}
+@keyframes pulso { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(.5)} }
 
-    /* ── Marker grid ── */
-    .markers-section {
-      padding: 0 24px 80px;
-      max-width: 960px;
-      margin: 0 auto;
-    }
+/* ── LOADING ── */
+#overlay-loading {
+  position: fixed; inset: 0; z-index: 500;
+  background: #0D0C0A;
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center; gap: 20px;
+}
+#overlay-loading.visible { display: flex; }
+.loading-ring {
+  width: 52px; height: 52px; border-radius: 50%;
+  border: 1px solid rgba(250,249,246,.06);
+  display: flex; align-items: center; justify-content: center;
+}
+.loading-spinner {
+  width: 38px; height: 38px;
+  border: 2px solid rgba(250,249,246,.08);
+  border-top-color: #C99EE8; border-radius: 50%;
+  animation: spin .85s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-txt { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: rgba(250,249,246,.3); }
 
-    .section-label {
-      text-align: center;
-      font-size: .7rem;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 32px;
-    }
+/* ── ERROR ── */
+#overlay-error {
+  position: fixed; inset: 0; z-index: 600;
+  background: #0D0C0A; display: none;
+  flex-direction: column; align-items: center; justify-content: center;
+  padding: 40px 32px; text-align: center; gap: 20px;
+}
+#overlay-error.visible { display: flex; }
+.error-icon { font-size: 3rem; }
+.error-titulo { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.6rem; font-weight: 300; color: #FAF9F6; }
+.error-desc { font-size: 13px; line-height: 1.75; color: rgba(250,249,246,.45); max-width: 300px; }
+.error-lista { text-align: left; font-size: 12px; color: rgba(250,249,246,.5); line-height: 1.9; border: 1px solid rgba(250,249,246,.08); border-radius: 8px; padding: 16px 20px; max-width: 320px; width: 100%; }
+.error-lista li { margin-left: 1em; }
+.btn-reintentar { display: inline-flex; align-items: center; gap: 8px; padding: 13px 32px; background: #C99EE8; color: #0D0C0A; font-family: 'DM Sans', system-ui, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; border: none; border-radius: 2px; cursor: pointer; }
+.btn-volver-err { font-size: 11px; color: rgba(250,249,246,.3); text-decoration: underline; cursor: pointer; background: none; border: none; font-family: 'DM Sans', system-ui, sans-serif; }
 
-    .markers-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
-    }
+/* ── HUD AR ── */
+#overlay-ar {
+  position: fixed; inset: 0; z-index: 100;
+  pointer-events: none; display: none;
+}
+#overlay-ar.visible { display: block; }
 
-    .marker-card {
-      position: relative;
-      border: 1px solid rgba(232,160,32,.2);
-      border-radius: var(--radius);
-      overflow: hidden;
-      cursor: pointer;
-      transition: border-color .3s, transform .3s;
-      background: rgba(255,255,255,.03);
-    }
-    .marker-card:hover {
-      border-color: var(--gold);
-      transform: translateY(-4px);
-    }
+#btn-volver {
+  position: absolute; top: 18px; left: 18px;
+  pointer-events: all;
+  display: flex; align-items: center; gap: 7px;
+  background: rgba(13,12,10,.6);
+  border: 1px solid rgba(250,249,246,.15);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-radius: 999px;
+  color: rgba(250,249,246,.85);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 12px; font-weight: 500; letter-spacing: .04em;
+  padding: 9px 18px; text-decoration: none;
+  transition: background .2s, border-color .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+#btn-volver:active { background: rgba(13,12,10,.8); }
 
-    .marker-card img {
-      width: 100%;
-      aspect-ratio: 3/4;
-      object-fit: contain;
-      padding: 20px;
-      background: #fff;
-      display: block;
-    }
+/* Tag diseño activo — cambia color según el diseño detectado */
+#hud-tag {
+  position: absolute; top: 18px; right: 18px;
+  background: rgba(13,12,10,.6);
+  border: 1px solid var(--tag-color, rgba(201,158,232,.35));
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-radius: 999px;
+  color: var(--tag-color, #C99EE8);
+  font-size: 10px; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase;
+  padding: 9px 16px;
+  transition: border-color .4s, color .4s;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s, border-color .4s, color .4s;
+}
+#hud-tag.visible { opacity: 1; }
 
-    .marker-card .card-info {
-      padding: 14px 16px;
-    }
-    .marker-card .card-info h3 {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 400;
-      font-size: 1.05rem;
-      color: var(--cream);
-      margin-bottom: 4px;
-    }
-    .marker-card .card-info p {
-      font-size: .73rem;
-      color: var(--gray);
-    }
+#scan-prompt {
+  position: absolute; bottom: 56px;
+  left: 50%; transform: translateX(-50%);
+  background: rgba(13,12,10,.72);
+  border: 1px solid rgba(250,249,246,.1);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-radius: 999px; padding: 12px 28px;
+  color: rgba(250,249,246,.8); font-size: 13px;
+  white-space: nowrap;
+  display: flex; align-items: center; gap: 10px;
+  transition: opacity .4s;
+}
+#scan-prompt.oculto { opacity: 0; pointer-events: none; }
 
-    .marker-card .target-badge {
-      position: absolute;
-      top: 10px; left: 10px;
-      background: rgba(232,160,32,.9);
-      color: var(--ink);
-      font-size: .63rem;
-      font-weight: 500;
-      padding: 3px 8px;
-      border-radius: 100px;
-      letter-spacing: .08em;
-    }
+.dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #C99EE8; flex-shrink: 0;
+  animation: pulso 1.5s ease-in-out infinite;
+}
 
-    /* ── CTA button ── */
-    .cta-wrap {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 80px;
-    }
+/* Marco de escaneo animado */
+#scan-frame {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(260px, 72vw); height: min(260px, 72vw);
+  pointer-events: none; transition: opacity .4s;
+}
+#scan-frame.oculto { opacity: 0; }
+#scan-frame::before, #scan-frame::after,
+#scan-frame .c3, #scan-frame .c4 {
+  content: '';
+  position: absolute; width: 28px; height: 28px;
+  border-color: rgba(201,158,232,.7); border-style: solid;
+}
+#scan-frame::before { top:0; left:0; border-width: 2px 0 0 2px; }
+#scan-frame::after  { top:0; right:0; border-width: 2px 2px 0 0; }
+#scan-frame .c3     { bottom:0; left:0; border-width: 0 0 2px 2px; }
+#scan-frame .c4     { bottom:0; right:0; border-width: 0 2px 2px 0; }
+.scan-line {
+  position: absolute; left: 4px; right: 4px; height: 2px;
+  background: linear-gradient(to right, transparent, rgba(201,158,232,.8), transparent);
+  animation: scanline 2.4s ease-in-out infinite;
+}
+@keyframes scanline {
+  0%   { top: 0; opacity: 1; }
+  90%  { top: calc(100% - 2px); opacity: 1; }
+  100% { top: calc(100% - 2px); opacity: 0; }
+}
 
-    .btn-ar {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      background: var(--gold);
-      color: var(--ink);
-      font-family: 'Archivo', sans-serif;
-      font-weight: 500;
-      font-size: .9rem;
-      letter-spacing: .04em;
-      padding: 16px 36px;
-      border-radius: 100px;
-      border: none;
-      cursor: pointer;
-      transition: background .25s, transform .2s, box-shadow .25s;
-      box-shadow: 0 0 0 0 rgba(232,160,32,0);
-    }
-    .btn-ar:hover {
-      background: var(--gold-lt);
-      transform: scale(1.04);
-      box-shadow: 0 8px 40px rgba(232,160,32,.35);
-    }
-    .btn-ar svg { width: 20px; height: 20px; }
+#badge-activo {
+  position: absolute; top: 66px;
+  left: 50%; transform: translateX(-50%);
+  background: rgba(13,12,10,.7);
+  border: 1px solid var(--tag-color, rgba(201,158,232,.4));
+  border-radius: 999px; padding: 7px 20px;
+  color: var(--tag-color, #C99EE8);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  white-space: nowrap; opacity: 0; transition: opacity .4s, border-color .3s, color .3s;
+}
+#badge-activo.visible { opacity: 1; }
 
-    /* ── AR overlay ── */
-    #ar-overlay {
-      display: none;
-      position: fixed; inset: 0;
-      z-index: 9999;
-      background: #000;
-    }
+#hint-tap {
+  position: absolute; bottom: 120px;
+  left: 50%; transform: translateX(-50%);
+  background: rgba(13,12,10,.6);
+  border: 1px solid var(--tag-color, rgba(201,158,232,.25));
+  border-radius: 999px; padding: 8px 20px;
+  color: var(--tag-color, #C99EE8);
+  font-size: 11px; letter-spacing: .06em;
+  white-space: nowrap; opacity: 0; transition: opacity .5s;
+  pointer-events: none;
+}
+#hint-tap.visible { opacity: 1; }
 
-    #ar-overlay.active { display: block; }
+/* ── ZONA TAP ── */
+#zona-tap {
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 160px; height: 160px; z-index: 150;
+  cursor: pointer; display: none;
+  -webkit-tap-highlight-color: transparent;
+}
+#zona-tap.activa { display: block; }
 
-    /* MindAR scene fills the overlay */
-    #ar-overlay a-scene {
-      position: absolute; inset: 0;
-    }
+/* ── SELECTOR CÁMARA ── */
+#cam-selector {
+  position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
+  z-index: 300; display: none;
+  background: rgba(13,12,10,.7);
+  border: 1px solid rgba(250,249,246,.15);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-radius: 999px; overflow: hidden; pointer-events: all;
+}
+#cam-selector.visible { display: flex; }
+.cam-btn {
+  padding: 9px 18px;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: rgba(250,249,246,.5);
+  background: transparent; border: none; cursor: pointer;
+  transition: color .2s, background .2s;
+  -webkit-tap-highlight-color: transparent;
+  display: flex; align-items: center; gap: 6px;
+}
+.cam-btn.activa { color: #0D0C0A; background: #C99EE8; }
 
-    /* Top bar over the camera */
-    .ar-bar {
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      z-index: 10001;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: linear-gradient(to bottom, rgba(0,0,0,.65) 0%, transparent 100%);
-    }
+/* ── PANEL INFO ── */
+#overlay-info {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; align-items: flex-end; justify-content: center;
+  pointer-events: none; opacity: 0; transition: opacity .5s ease;
+}
+#overlay-info.visible { opacity: 1; pointer-events: all; }
+#overlay-info::before {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(13,12,10,.55); backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px); opacity: 0; transition: opacity .5s ease;
+}
+#overlay-info.visible::before { opacity: 1; }
+.panel-info {
+  position: relative; width: 100%; max-width: 540px;
+  max-height: 80vh; overflow-y: auto;
+  background: #0D0C0A;
+  border: 1px solid rgba(250,249,246,.08); border-bottom: none;
+  border-radius: 20px 20px 0 0; padding: 8px 28px 36px; z-index: 1;
+  transform: translateY(100%);
+  transition: transform .55s cubic-bezier(0.16,1,0.3,1);
+}
+#overlay-info.visible .panel-info { transform: translateY(0); }
+.panel-handle { width: 36px; height: 4px; background: rgba(250,249,246,.12); border-radius: 2px; margin: 12px auto 28px; }
+.panel-info::-webkit-scrollbar { width: 3px; }
+.panel-info::-webkit-scrollbar-track { background: transparent; }
+.panel-info::-webkit-scrollbar-thumb { background: rgba(201,158,232,.25); border-radius: 2px; }
 
-    .ar-bar .brand {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.2rem;
-      color: #fff;
-      letter-spacing: .1em;
-    }
+.panel-ornamento {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 22px;
+}
+.panel-ornamento::before, .panel-ornamento::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--tag-color, rgba(201,158,232,.2)), transparent);
+}
+.panel-ornamento span { font-size: 12px; color: var(--tag-color, #C99EE8); opacity: .5; letter-spacing: 4px; }
+.panel-etiqueta { font-family: 'DM Sans', system-ui, sans-serif; font-size: 9px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--tag-color, #C99EE8); opacity: .6; text-align: center; margin-bottom: 10px; }
+.panel-titulo { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(1.5rem,6vw,2rem); font-weight: 300; color: #FAF9F6; text-align: center; line-height: 1.2; margin-bottom: 22px; }
+.panel-divider { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+.panel-divider::before, .panel-divider::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(250,249,246,.08), transparent); }
+.panel-divider span { font-size: 10px; color: var(--tag-color, #C99EE8); opacity: .4; letter-spacing: 3px; }
+.panel-texto { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 16px; font-weight: 300; line-height: 1.9; color: rgba(250,249,246,.65); text-align: justify; hyphens: auto; }
+.panel-texto .capital { float: left; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 4rem; font-weight: 600; line-height: .72; color: var(--tag-color, #C99EE8); margin-right: 5px; margin-top: 10px; }
+.panel-texto p { margin-bottom: 16px; }
+.panel-texto p:last-child { margin-bottom: 0; }
+.panel-texto em { color: var(--tag-color, #C99EE8); font-style: italic; opacity: .9; }
+.panel-cierre { margin-top: 28px; text-align: center; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 12px; color: rgba(250,249,246,.2); }
+.btn-cerrar-info { display: block; width: 100%; margin-top: 24px; padding: 13px; background: transparent; border: 1px solid rgba(250,249,246,.08); border-radius: 4px; color: rgba(250,249,246,.35); font-family: 'DM Sans', system-ui, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; transition: background .2s, color .2s, border-color .2s; -webkit-tap-highlight-color: transparent; }
+.btn-cerrar-info:hover { background: rgba(250,249,246,.04); color: rgba(250,249,246,.6); border-color: rgba(250,249,246,.14); }
 
-    .ar-close {
-      background: rgba(255,255,255,.15);
-      border: 1px solid rgba(255,255,255,.3);
-      color: #fff;
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.2rem;
-      backdrop-filter: blur(8px);
-      transition: background .2s;
-    }
-    .ar-close:hover { background: rgba(255,255,255,.28); }
-
-    /* Scanning hint */
-    .ar-hint {
-      position: absolute;
-      bottom: 36px; left: 50%; transform: translateX(-50%);
-      z-index: 10001;
-      background: rgba(0,0,0,.55);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(232,160,32,.3);
-      border-radius: 100px;
-      padding: 10px 24px;
-      color: rgba(255,255,255,.85);
-      font-size: .8rem;
-      letter-spacing: .06em;
-      white-space: nowrap;
-      pointer-events: none;
-    }
-
-    /* Scan frame animation */
-    .scan-frame {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: min(280px, 75vw);
-      height: min(280px, 75vw);
-      z-index: 10000;
-      pointer-events: none;
-    }
-    .scan-frame::before, .scan-frame::after,
-    .scan-frame .c3, .scan-frame .c4 {
-      content: '';
-      position: absolute;
-      width: 32px; height: 32px;
-      border-color: var(--gold);
-      border-style: solid;
-    }
-    .scan-frame::before  { top:0;    left:0;  border-width: 2px 0 0 2px; }
-    .scan-frame::after   { top:0;    right:0; border-width: 2px 2px 0 0; }
-    .scan-frame .c3      { bottom:0; left:0;  border-width: 0 0 2px 2px; }
-    .scan-frame .c4      { bottom:0; right:0; border-width: 0 2px 2px 0; }
-
-    @keyframes scanline {
-      0%   { top: 0; opacity: 1; }
-      90%  { top: calc(100% - 2px); opacity: 1; }
-      100% { top: calc(100% - 2px); opacity: 0; }
-    }
-    .scan-line {
-      position: absolute;
-      left: 4px; right: 4px;
-      height: 2px;
-      background: linear-gradient(to right, transparent, var(--gold), transparent);
-      animation: scanline 2.2s ease-in-out infinite;
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 480px) {
-      .steps { flex-direction: column; align-items: center; }
-      .step  { max-width: 100%; width: 100%; }
-    }
+/* Animaciones entrada panel */
+.panel-texto p, .panel-etiqueta, .panel-titulo,
+.panel-ornamento, .panel-divider, .panel-cierre {
+  opacity: 0; transform: translateY(8px);
+  transition: opacity .45s ease, transform .45s ease;
+}
+#overlay-info.visible .panel-ornamento  { opacity:1; transform:translateY(0); transition-delay:.15s; }
+#overlay-info.visible .panel-etiqueta   { opacity:1; transform:translateY(0); transition-delay:.2s;  }
+#overlay-info.visible .panel-titulo     { opacity:1; transform:translateY(0); transition-delay:.25s; }
+#overlay-info.visible .panel-divider    { opacity:1; transform:translateY(0); transition-delay:.3s;  }
+#overlay-info.visible .panel-texto p    { opacity:1; transform:translateY(0); }
+#overlay-info.visible .panel-texto p:nth-child(1) { transition-delay:.35s; }
+#overlay-info.visible .panel-texto p:nth-child(2) { transition-delay:.55s; }
+#overlay-info.visible .panel-texto p:nth-child(3) { transition-delay:.75s; }
+#overlay-info.visible .panel-cierre     { opacity:1; transform:translateY(0); transition-delay:1s; }
   </style>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('../coi-serviceworker.js').then(reg => {
+        if (reg.installing) {
+          reg.installing.addEventListener('statechange', e => {
+            if (e.target.state === 'activated') location.reload();
+          });
+        }
+      }).catch(err => console.warn('[SW]', err));
+    }
+  </script>
 </head>
 <body>
 
-<!-- ════════════════════════════════════════════
-     SECCIÓN HERO
-════════════════════════════════════════════ -->
-<section class="hero">
-  <div class="hero-badge"><span></span>Realidad Aumentada</div>
-  <h1>Tus diseños<br/><em>cobran vida</em></h1>
-  <p>Apunta la cámara a cualquiera de los marcadores impresos o en pantalla y mira el diseño en 3D emerger ante tus ojos.</p>
+<!-- ══ SPLASH ══ -->
+<div id="overlay-inicio">
+  <div class="splash-ornamento"></div>
+  <p class="splash-eyebrow">Realidad Aumentada · LOOK LAB IVVI</p>
+  <div class="splash-icono">✦</div>
+  <h1 class="splash-titulo">Todos los<br>diseños</h1>
+  <p class="splash-subtitulo">Realidad Aumentada</p>
+  <p class="splash-desc">
+    Apunta la cámara a cualquiera de los marcadores impresos
+    y el modelo 3D de esa camiseta aparecerá en el aire.
+  </p>
 
-  <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <p>Imprime o muestra el marcador de tu diseño favorito</p>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <p>Abre la cámara AR tocando el botón de abajo</p>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <p>Apunta al marcador y el modelo 3D aparece al instante</p>
-    </div>
+  <!-- Chips de cada marcador disponible -->
+  <div class="splash-markers">
+    <span class="splash-marker-chip">
+      <span class="dot-color" style="background:#E8374A"></span>Rosa
+    </span>
+    <span class="splash-marker-chip">
+      <span class="dot-color" style="background:#E8A020"></span>Girasol
+    </span>
+    <span class="splash-marker-chip">
+      <span class="dot-color" style="background:#8B44C0"></span>Gloxinia
+    </span>
   </div>
 
-  <button class="btn-ar" onclick="openAR()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/>
-      <rect x="7" y="7" width="10" height="10" rx="1"/>
-    </svg>
-    Abrir cámara AR
-  </button>
-</section>
-
-<!-- ════════════════════════════════════════════
-     GRID DE MARCADORES
-════════════════════════════════════════════ -->
-<section class="markers-section">
-  <p class="section-label">Marcadores disponibles — apúntale la cámara</p>
-
-  <div class="markers-grid" id="markersGrid">
-    <!-- Las tarjetas se generan desde DISEÑOS en el JS -->
-  </div>
-</section>
-
-<div class="cta-wrap">
-  <button class="btn-ar" onclick="openAR()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/>
-      <rect x="7" y="7" width="10" height="10" rx="1"/>
-    </svg>
-    Abrir cámara AR
+  <button id="btn-iniciar">
+    <span class="btn-dot"></span>
+    Activar cámara
   </button>
 </div>
 
+<!-- ══ LOADING ══ -->
+<div id="overlay-loading">
+  <div class="loading-ring"><div class="loading-spinner"></div></div>
+  <p class="loading-txt">Cargando marcadores…</p>
+</div>
 
-<!-- ════════════════════════════════════════════
-     OVERLAY AR (se activa al abrir cámara)
-════════════════════════════════════════════ -->
-<div id="ar-overlay">
+<!-- ══ ERROR ══ -->
+<div id="overlay-error">
+  <div class="error-icon">📷</div>
+  <h2 class="error-titulo">No se pudo acceder<br>a la cámara</h2>
+  <p class="error-desc">Posibles causas:</p>
+  <ul class="error-lista">
+    <li>El navegador bloqueó el permiso de cámara</li>
+    <li>La página no se sirve desde HTTPS o localhost</li>
+    <li>Otra aplicación está usando la cámara</li>
+    <li>El dispositivo no tiene cámara trasera</li>
+  </ul>
+  <p class="error-desc" style="font-size:11px;margin-top:4px">
+    <strong style="color:rgba(250,249,246,.7)">Solución:</strong>
+    Icono de candado en la barra del navegador → Cámara → Permitir → Recargar página.
+  </p>
+  <button class="btn-reintentar" onclick="reintentar()">🔄 Reintentar</button>
+  <button class="btn-volver-err" onclick="history.back()">← Volver</button>
+</div>
 
-  <!-- Barra superior -->
-  <div class="ar-bar">
-    <span class="brand">IVVI</span>
-    <button class="ar-close" onclick="closeAR()">✕</button>
-  </div>
+<!-- ══ HUD AR ══ -->
+<div id="overlay-ar">
+  <a href="../disenios-ra.html" id="btn-volver">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+    Volver
+  </a>
+  <div id="hud-tag"></div>
+  <div id="badge-activo"></div>
+  <div id="hint-tap">Toca para saber más</div>
 
-  <!-- Marco de escaneo (visible antes de detectar) -->
-  <div class="scan-frame" id="scanFrame">
+  <!-- Marco de escaneo -->
+  <div id="scan-frame">
     <div class="c3"></div>
     <div class="c4"></div>
     <div class="scan-line"></div>
   </div>
 
-  <!-- Hint inferior -->
-  <div class="ar-hint" id="arHint">Apunta al marcador de cualquier diseño</div>
-
-  <!-- ══ ESCENA A-FRAME / MINDAR ══
-       El archivo targets.mind debe contener TODAS las imágenes compiladas juntas.
-       Cada <a-entity mindar-image-target="targetIndex: N"> corresponde
-       al índice de la imagen en el .mind (orden en que las subiste al trainer).
-  -->
-  <a-scene
-    id="arScene"
-    mindar-image="
-      imageTargetSrc: targets/targets.mind;
-      autoStart: false;
-      uiLoading: no;
-      uiScanning: no;
-      uiError: no;
-      filterMinCF: 0.001;
-      filterBeta: 0.01;
-      warmupTolerance: 5;
-      missTolerance: 5
-    "
-    color-space="sRGB"
-    renderer="colorManagement: true; physicallyCorrectLights: true"
-    vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: false"
-  >
-
-    <a-assets>
-      <!-- ▼▼▼ AGREGA AQUÍ TUS MODELOS GLB ▼▼▼ -->
-      <a-asset-item id="model-girasol"  src="models/girasol.glb"></a-asset-item>
-      <a-asset-item id="model-diseño2"  src="models/diseño2.glb"></a-asset-item>
-      <a-asset-item id="model-diseño3"  src="models/diseño3.glb"></a-asset-item>
-      <!-- ▲▲▲ fin modelos ▲▲▲ -->
-
-      <!-- Luz ambiente suave -->
-      <a-light type="ambient" color="#ffffff" intensity="0.6"></a-light>
-      <a-light type="directional" color="#fff5e0" intensity="0.9" position="1 2 2"></a-light>
-    </a-assets>
-
-    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
-    <!-- ── Target 0: Girasol ── -->
-    <a-entity mindar-image-target="targetIndex: 0"
-              id="target-0"
-              visible="false">
-      <a-gltf-model
-        src="#model-girasol"
-        position="0 0 0"
-        rotation="0 0 0"
-        scale="0.08 0.08 0.08"
-        animation__appear="
-          property: scale;
-          from: 0 0 0;
-          to: 0.08 0.08 0.08;
-          dur: 500;
-          easing: easeOutElastic;
-          startEvents: targetFound
-        "
-        animation__float="
-          property: position;
-          from: 0 0 0;
-          to: 0 0.015 0;
-          dur: 2200;
-          easing: easeInOutSine;
-          loop: true;
-          dir: alternate
-        "
-        animation__rotate="
-          property: rotation;
-          from: -5 0 -3;
-          to:  5 8 3;
-          dur: 4000;
-          easing: easeInOutSine;
-          loop: true;
-          dir: alternate
-        "
-      ></a-gltf-model>
-    </a-entity>
-
-    <!-- ── Target 1: Diseño 2 ── -->
-    <a-entity mindar-image-target="targetIndex: 1"
-              id="target-1"
-              visible="false">
-      <a-gltf-model
-        src="#model-diseño2"
-        position="0 0 0"
-        rotation="0 0 0"
-        scale="0.08 0.08 0.08"
-        animation__appear="
-          property: scale;
-          from: 0 0 0;
-          to: 0.08 0.08 0.08;
-          dur: 500;
-          easing: easeOutElastic;
-          startEvents: targetFound
-        "
-        animation__float="
-          property: position;
-          from: 0 0 0;
-          to: 0 0.015 0;
-          dur: 2400;
-          easing: easeInOutSine;
-          loop: true;
-          dir: alternate
-        "
-        animation__rotate="
-          property: rotation;
-          from: -4 0 -2;
-          to:  4 6 2;
-          dur: 4200;
-          easing: easeInOutSine;
-          loop: true;
-          dir: alternate
-        "
-      ></a-gltf-model>
-    </a-entity>
-
-    <!-- ── Target 2: Diseño 3 ── -->
-    <a-entity mindar-image-target="targetIndex: 2"
-              id="target-2"
-              visible="false">
-      <a-gltf-model
-        src="#model-diseño3"
-        position="0 0 0"
-        rotation="0 0 0"
-        scale="0.08 0.08 0.08"
-        animation__appear="
-          property: scale;
-          from: 0 0 0;
-          to: 0.08 0.08 0.08;
-          dur: 500;
-          easing: easeOutElastic;
-          startEvents: targetFound
-        "
-        animation__float="
-          property: position;
-          from: 0 0 0;
-          to: 0 0.015 0;
-          dur: 2000;
-          easing: easeInOutSine;
-          loop: true;
-          dir: alternate
-        "
-        animation__rotate="
-          property: rotation;
-          from: -6 0 -4;
-          to:  6 10 4;
-          dur: 3800;
-          easing: easeInOutSine;
-          loop: true;
-          dir: alternate
-        "
-      ></a-gltf-model>
-    </a-entity>
-
-    <!--
-    ╔═══════════════════════════════════════════════════╗
-    ║  PARA AGREGAR MÁS DISEÑOS:                        ║
-    ║  1. Añade el .glb en <a-assets>                   ║
-    ║  2. Copia un bloque <a-entity> y cambia:          ║
-    ║     · targetIndex al siguiente número             ║
-    ║     · src="#model-TUNUEVO"                        ║
-    ║  3. Agrega la imagen al array DISEÑOS en el JS    ║
-    ║  4. Recompila targets.mind con la nueva imagen    ║
-    ╚═══════════════════════════════════════════════════╝
-    -->
-
-  </a-scene>
+  <div id="scan-prompt">
+    <span class="dot"></span>
+    Apunta a cualquier diseño
+  </div>
 </div>
 
+<!-- ══ SELECTOR CÁMARA ══ -->
+<div id="cam-selector">
+  <button class="cam-btn activa" id="btn-cam-trasera">
+    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+      <circle cx="12" cy="13" r="4"/>
+    </svg>
+    Trasera
+  </button>
+  <button class="cam-btn" id="btn-cam-frontal">
+    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="4"/>
+      <path d="M2 12h3M17 12h3M12 2v3M12 17v3"/>
+    </svg>
+    Selfie
+  </button>
+</div>
 
-<!-- ════════════════════════════════════════════
-     JAVASCRIPT
-════════════════════════════════════════════ -->
+<!-- ══ ZONA TAP ══ -->
+<div id="zona-tap"></div>
+
+<!-- ══ PANEL INFO (contenido dinámico) ══ -->
+<div id="overlay-info">
+  <div class="panel-info">
+    <div class="panel-handle"></div>
+    <div class="panel-ornamento"><span>✦</span></div>
+    <p class="panel-etiqueta" id="panel-etiqueta-txt"></p>
+    <h2 class="panel-titulo" id="panel-titulo-txt"></h2>
+    <div class="panel-divider"><span>❧</span></div>
+    <div class="panel-texto" id="panel-cuerpo-txt"></div>
+    <p class="panel-cierre">LOOK LAB IVVI · 2026</p>
+    <button class="btn-cerrar-info" id="btn-cerrar-info">Cerrar</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     ESCENA A-FRAME — UNA SOLA CÁMARA, UN SOLO .mind
+
+     targets/targets-todos.mind debe compilarse con las
+     3 imágenes marcadoras en este orden exacto:
+       0 → Rosa (delantera)
+       1 → Girasol (delantera)
+       2 → Gloxinia (delantera)
+
+     Para compilar: https://hiukim.github.io/mind-ar-js-doc/tools/compile
+     Sube las imágenes en ese orden y descarga el .mind resultante.
+══════════════════════════════════════════════════════════ -->
+<a-scene
+  id="escena-ar"
+  mindar-image="
+    imageTargetSrc: targets/targets-todos.mind;
+    maxTrack: 1;
+    uiLoading: no;
+    uiScanning: no;
+    uiError: no;
+    filterMinCF: 0.001;
+    filterBeta: 0.01;
+    warmupTolerance: 5;
+    missTolerance: 5
+  "
+  color-space="sRGB"
+  renderer="colorManagement: true; physicallyCorrectLights: true"
+  vr-mode-ui="enabled: false"
+  device-orientation-permission-ui="enabled: false"
+  style="opacity:0;pointer-events:none"
+>
+  <a-assets>
+    <!--
+      ▼▼▼ REEMPLAZA ESTAS RUTAS con los .glb reales de cada camiseta ▼▼▼
+      Estos son los modelos que antes aparecían debajo de cada prenda.
+    -->
+    <a-asset-item id="model-rosa"     src="ar/models/rosa.glb"></a-asset-item>
+    <a-asset-item id="model-girasol"  src="ar/models/girasol.glb"></a-asset-item>
+    <a-asset-item id="model-gloxinia" src="ar/models/glox.glb"></a-asset-item>
+  </a-assets>
+
+  <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+  <!-- ──────────────────────────────────────
+       TARGET 0 — Rosa (targetIndex: 0)
+  ────────────────────────────────────── -->
+  <a-entity mindar-image-target="targetIndex: 0" id="target-0">
+    <a-gltf-model
+      src="#model-rosa"
+      position="0 0.05 0"
+      rotation="0 0 0"
+      scale="0 0 0"
+      animation__aparecer="
+        property: scale;
+        from: 0 0 0;
+        to: 0.09 0.09 0.09;
+        dur: 600;
+        easing: easeOutElastic;
+        startEvents: model-aparecer
+      "
+      animation__flotar="
+        property: position;
+        from: 0 0.05 0;
+        to: 0 0.07 0;
+        dur: 2400;
+        easing: easeInOutSine;
+        loop: true;
+        dir: alternate
+      "
+      animation__rotar="
+        property: rotation;
+        from: -4 -8 -2;
+        to: 4 8 2;
+        dur: 4000;
+        easing: easeInOutSine;
+        loop: true;
+        dir: alternate
+      "
+    ></a-gltf-model>
+  </a-entity>
+
+  <!-- ──────────────────────────────────────
+       TARGET 1 — Girasol (targetIndex: 1)
+  ────────────────────────────────────── -->
+  <a-entity mindar-image-target="targetIndex: 1" id="target-1">
+    <a-gltf-model
+      src="#model-girasol"
+      position="0 0.05 0"
+      rotation="0 0 0"
+      scale="0 0 0"
+      animation__aparecer="
+        property: scale;
+        from: 0 0 0;
+        to: 0.09 0.09 0.09;
+        dur: 600;
+        easing: easeOutElastic;
+        startEvents: model-aparecer
+      "
+      animation__flotar="
+        property: position;
+        from: 0 0.05 0;
+        to: 0 0.07 0;
+        dur: 2200;
+        easing: easeInOutSine;
+        loop: true;
+        dir: alternate
+      "
+      animation__rotar="
+        property: rotation;
+        from: -5 -6 -3;
+        to: 5 6 3;
+        dur: 4400;
+        easing: easeInOutSine;
+        loop: true;
+        dir: alternate
+      "
+    ></a-gltf-model>
+  </a-entity>
+
+  <!-- ──────────────────────────────────────
+       TARGET 2 — Gloxinia (targetIndex: 2)
+  ────────────────────────────────────── -->
+  <a-entity mindar-image-target="targetIndex: 2" id="target-2">
+    <a-gltf-model
+      src="#model-gloxinia"
+      position="0 0.05 0"
+      rotation="0 0 0"
+      scale="0 0 0"
+      animation__aparecer="
+        property: scale;
+        from: 0 0 0;
+        to: 0.09 0.09 0.09;
+        dur: 600;
+        easing: easeOutElastic;
+        startEvents: model-aparecer
+      "
+      animation__flotar="
+        property: position;
+        from: 0 0.05 0;
+        to: 0 0.07 0;
+        dur: 2600;
+        easing: easeInOutSine;
+        loop: true;
+        dir: alternate
+      "
+      animation__rotar="
+        property: rotation;
+        from: -3 -10 -2;
+        to: 3 10 2;
+        dur: 3800;
+        easing: easeInOutSine;
+        loop: true;
+        dir: alternate
+      "
+    ></a-gltf-model>
+  </a-entity>
+
+  <!--
+  ╔══════════════════════════════════════════════════════╗
+  ║  PARA AGREGAR MÁS DISEÑOS EN EL FUTURO:             ║
+  ║  1. Recompila targets-todos.mind con la nueva imagen ║
+  ║  2. Agrega el .glb en <a-assets>                    ║
+  ║  3. Copia un bloque <a-entity> y sube el targetIndex ║
+  ║  4. Agrega el diseño al array DISEÑOS en el JS      ║
+  ╚══════════════════════════════════════════════════════╝
+  -->
+
+  <!-- Luces -->
+  <a-light type="ambient"     color="#ffffff"  intensity="0.7"></a-light>
+  <a-light type="directional" color="#fff8f0"  intensity="1.0" position="1 2 2"></a-light>
+  <a-light type="directional" color="#f0f0ff"  intensity="0.3" position="-2 1 -1"></a-light>
+
+</a-scene>
+
+
 <script>
-/* ══════════════════════════════════════════════
-   ▼▼▼  CONFIGURACIÓN — edita solo esto ▼▼▼
-   Agrega un objeto por cada diseño.
-   El índice del array (0,1,2…) debe coincidir
-   con el targetIndex en la escena A-Frame y con
-   el orden en que subiste las imágenes al trainer.
-══════════════════════════════════════════════ */
+'use strict';
+
+/* ══════════════════════════════════════════════════════════
+   CONFIGURACIÓN DE DISEÑOS
+   Cada objeto corresponde a un targetIndex (0, 1, 2…).
+   El orden debe coincidir con el orden en que subiste
+   las imágenes al MindAR Image Trainer.
+══════════════════════════════════════════════════════════ */
 const DISEÑOS = [
   {
+    nombre:      'Rosa',
+    coleccion:   'Diseño 01 · Colección Esencial',
+    color:       '#E8374A',
+    colorAlpha:  'rgba(232,55,74,.35)',
+    emoji:       '🌹',
+    escala:      '0.09 0.09 0.09',
+    descripcion: [
+      `<span class="capital">L</span>a <em>rosa</em> ha sido símbolo de elegancia y pasión a lo largo de los siglos. En esta colección la reinterpretamos bajo un concepto de minimalismo funcional: líneas limpias que encuadran su esencia sin restarle intensidad.`,
+      `Los <em>acentos en rojo</em> no son solo un recurso estético — son una declaración. Cada detalle está diseñado para que la prenda hable por sí misma.`,
+    ]
+  },
+  {
     nombre:      'Girasol',
-    descripcion: 'Colección Flores Silvestres',
-    marker:      'markers/girasol_blanco_adelante.png',
+    coleccion:   'Diseño 02 · Edición Moderna',
+    color:       '#E8A020',
+    colorAlpha:  'rgba(232,160,32,.35)',
+    emoji:       '🌻',
+    escala:      '0.09 0.09 0.09',
+    descripcion: [
+      `<span class="capital">E</span>l <em>girasol</em> siempre mira hacia la luz. Este diseño captura esa energía vital y la transforma en una pieza que irradia calidez en cada hilo.`,
+      `Los <em>acentos en dorado</em> evocan el sol al mediodía: directos, generosos y sin reservas. Una prenda para quienes eligen brillar.`,
+    ]
   },
   {
-    nombre:      'Diseño 2',
-    descripcion: 'Nombre de tu colección',
-    marker:      'markers/diseño2.png',
+    nombre:      'Gloxinia',
+    coleccion:   'Diseño 03 · Elegancia Contemporánea',
+    color:       '#8B44C0',
+    colorAlpha:  'rgba(139,68,192,.35)',
+    emoji:       '🌸',
+    escala:      '0.09 0.09 0.09',
+    descripcion: [
+      `<span class="capital">L</span>a <em>gloxinia</em> florece en sombra y en silencio. Su belleza es discreta, profunda — la de quien no necesita anunciarse para ser recordado.`,
+      `Los <em>acentos en morado</em> recorren cada curva del diseño como una firma. Sofisticación sin esfuerzo, elegancia sin artificios.`,
+    ]
   },
-  {
-    nombre:      'Diseño 3',
-    descripcion: 'Nombre de tu colección',
-    marker:      'markers/diseño3.png',
-  },
-  // ← Agrega más aquí siguiendo el mismo formato
+  // ← Para agregar más diseños, sigue el mismo patrón
 ];
-/* ▲▲▲  FIN CONFIGURACIÓN  ▲▲▲ */
 
+/* ══════════════════════════════════════════════════════════
+   ESTADO
+══════════════════════════════════════════════════════════ */
+let arStarted     = false;
+let usandoFrontal = false;
+let targetActivo  = -1;
+let streamPrueba  = null;
 
-/* ── Generar tarjetas de marcadores ── */
-const grid = document.getElementById('markersGrid');
-DISEÑOS.forEach((d, i) => {
-  grid.innerHTML += `
-    <div class="marker-card">
-      <span class="target-badge">Marcador ${i + 1}</span>
-      <img src="${d.marker}" alt="Marcador ${d.nombre}" loading="lazy" />
-      <div class="card-info">
-        <h3>${d.nombre}</h3>
-        <p>${d.descripcion}</p>
-      </div>
-    </div>`;
+/* ── Elementos DOM ── */
+const overlayInicio  = document.getElementById('overlay-inicio');
+const overlayLoading = document.getElementById('overlay-loading');
+const overlayAR      = document.getElementById('overlay-ar');
+const overlayInfo    = document.getElementById('overlay-info');
+const overlayError   = document.getElementById('overlay-error');
+const escena         = document.getElementById('escena-ar');
+const scanPrompt     = document.getElementById('scan-prompt');
+const scanFrame      = document.getElementById('scan-frame');
+const badgeActivo    = document.getElementById('badge-activo');
+const hintTap        = document.getElementById('hint-tap');
+const hudTag         = document.getElementById('hud-tag');
+const zonaTap        = document.getElementById('zona-tap');
+const camSelector    = document.getElementById('cam-selector');
+const btnCamTrasera  = document.getElementById('btn-cam-trasera');
+const btnCamFrontal  = document.getElementById('btn-cam-frontal');
+
+/* ── Aplicar color de acento al HUD ── */
+function aplicarColor(color, alpha) {
+  const els = [overlayAR, overlayInfo];
+  els.forEach(el => el.style.setProperty('--tag-color', color));
+  document.querySelectorAll('.dot').forEach(d => d.style.background = color);
+}
+
+function resetColor() {
+  [overlayAR, overlayInfo].forEach(el => el.style.removeProperty('--tag-color'));
+  document.querySelectorAll('.dot').forEach(d => d.style.background = '#C99EE8');
+}
+
+/* ── Activar cámara ── */
+document.getElementById('btn-iniciar').addEventListener('click', async () => {
+  const ok = await pedirPermiso('environment');
+  if (!ok) return;
+
+  overlayInicio.classList.add('saliendo');
+  setTimeout(() => overlayInicio.classList.add('oculto'), 500);
+
+  overlayLoading.classList.add('visible');
+  escena.style.opacity      = '1';
+  escena.style.pointerEvents = 'all';
+  iniciarAR();
 });
 
-/* ── Control del overlay AR ── */
-let sceneStarted = false;
-
-function openAR() {
-  const overlay = document.getElementById('ar-overlay');
-  overlay.classList.add('active');
-  document.body.style.overflow = 'hidden';
-
-  if (!sceneStarted) {
-    const scene = document.getElementById('arScene');
-    scene.addEventListener('loaded', () => {
-      scene.systems['mindar-image-system'].start();
-      sceneStarted = true;
-    }, { once: true });
-
-    // Si la escena ya estaba cargada
-    if (scene.hasLoaded) {
-      scene.systems['mindar-image-system'].start();
-      sceneStarted = true;
-    }
-  } else {
-    document.getElementById('arScene').systems['mindar-image-system'].start();
-  }
-
-  setupTargetEvents();
-}
-
-function closeAR() {
-  const overlay = document.getElementById('ar-overlay');
-  overlay.classList.remove('active');
-  document.body.style.overflow = '';
-
+async function pedirPermiso(facing) {
   try {
-    document.getElementById('arScene').systems['mindar-image-system'].stop();
-  } catch(e) {}
-
-  document.getElementById('scanFrame').style.display = '';
-  document.getElementById('arHint').textContent = 'Apunta al marcador de cualquier diseño';
+    if (streamPrueba) { streamPrueba.getTracks().forEach(t => t.stop()); streamPrueba = null; }
+    streamPrueba = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: facing }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      audio: false
+    });
+    streamPrueba.getTracks().forEach(t => t.stop());
+    streamPrueba = null;
+    return true;
+  } catch (err) {
+    console.error('[AR] Permiso cámara:', err.name);
+    overlayError.classList.add('visible');
+    return false;
+  }
 }
 
-/* Ocultar marco de escaneo cuando se detecta un target */
-function setupTargetEvents() {
-  DISEÑOS.forEach((_, i) => {
-    const entity = document.getElementById(`target-${i}`);
-    if (!entity) return;
+/* ── Iniciar AR ── */
+function iniciarAR() {
+  if (arStarted) return;
+  arStarted = true;
 
-    entity.addEventListener('targetFound', () => {
-      document.getElementById('scanFrame').style.display = 'none';
-      document.getElementById('arHint').textContent =
-        `✦ ${DISEÑOS[i].nombre} detectado`;
+  escena.addEventListener('arReady', () => {
+    overlayLoading.classList.remove('visible');
+    overlayAR.classList.add('visible');
+    camSelector.classList.add('visible');
+  });
+
+  escena.addEventListener('arError', () => {
+    overlayLoading.classList.remove('visible');
+    overlayError.classList.add('visible');
+  });
+
+  /* Registrar targets dinámicamente según DISEÑOS */
+  DISEÑOS.forEach((d, i) => {
+    const el = document.getElementById(`target-${i}`);
+    if (!el) return;
+
+    el.addEventListener('targetFound', () => {
+      targetActivo = i;
+      const diseño = DISEÑOS[i];
+
+      /* Disparar animación de aparición del modelo */
+      const modelo = el.querySelector('a-gltf-model');
+      if (modelo) modelo.emit('model-aparecer');
+
+      /* HUD */
+      aplicarColor(diseño.color, diseño.colorAlpha);
+      hudTag.textContent  = `${diseño.emoji} ${diseño.nombre}`;
+      hudTag.classList.add('visible');
+      badgeActivo.textContent = `✦ ${diseño.nombre} detectado`;
+      badgeActivo.classList.add('visible');
+      hintTap.classList.add('visible');
+      zonaTap.classList.add('activa');
+      scanPrompt.classList.add('oculto');
+      scanFrame.classList.add('oculto');
     });
 
-    entity.addEventListener('targetLost', () => {
-      const anyVisible = DISEÑOS.some((_, j) => {
-        const e = document.getElementById(`target-${j}`);
-        return e && e.getAttribute('visible') === true;
-      });
-      if (!anyVisible) {
-        document.getElementById('scanFrame').style.display = '';
-        document.getElementById('arHint').textContent =
-          'Apunta al marcador de cualquier diseño';
-      }
+    el.addEventListener('targetLost', () => {
+      if (targetActivo !== i) return;
+      targetActivo = -1;
+
+      /* Ocultar modelo (volver a escala 0) */
+      const modelo = el.querySelector('a-gltf-model');
+      if (modelo) modelo.setAttribute('scale', '0 0 0');
+
+      /* Reset HUD */
+      resetColor();
+      hudTag.classList.remove('visible');
+      badgeActivo.classList.remove('visible');
+      hintTap.classList.remove('visible');
+      zonaTap.classList.remove('activa');
+      scanPrompt.classList.remove('oculto');
+      scanFrame.classList.remove('oculto');
     });
   });
 }
 
-/* Cerrar con tecla Escape en desktop */
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeAR();
-});
-</script>
+/* ── Cambio de cámara ── */
+btnCamTrasera.addEventListener('click', () => { if (usandoFrontal) cambiarCamara(false); });
+btnCamFrontal.addEventListener('click', () => { if (!usandoFrontal) cambiarCamara(true); });
 
+function cambiarCamara(frontal) {
+  usandoFrontal = frontal;
+  btnCamTrasera.classList.toggle('activa', !frontal);
+  btnCamFrontal.classList.toggle('activa', frontal);
+
+  const sys = escena.systems?.['mindar-image-system'];
+  if (!sys) return;
+  sys.stop();
+
+  setTimeout(() => {
+    const vid = document.querySelector('video[autoplay]');
+    if (vid?.srcObject) vid.srcObject.getTracks().forEach(t => t.stop());
+
+    navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: frontal ? 'user' : 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+      audio: false
+    }).then(stream => {
+      if (vid) { vid.srcObject = stream; vid.play().catch(() => {}); }
+      sys.start();
+    }).catch(err => {
+      console.error('[AR] Cambio cámara:', err);
+      usandoFrontal = !frontal;
+      btnCamTrasera.classList.toggle('activa', frontal);
+      btnCamFrontal.classList.toggle('activa', !frontal);
+    });
+  }, 400);
+}
+
+/* ── Panel info ── */
+zonaTap.addEventListener('click', () => {
+  if (targetActivo < 0) return;
+  const d = DISEÑOS[targetActivo];
+
+  document.getElementById('panel-etiqueta-txt').textContent = d.coleccion;
+  document.getElementById('panel-titulo-txt').textContent   = d.nombre;
+  document.getElementById('panel-cuerpo-txt').innerHTML     =
+    d.descripcion.map(p => `<p>${p}</p>`).join('');
+
+  overlayInfo.classList.add('visible');
+  zonaTap.classList.remove('activa');
+  hintTap.classList.remove('visible');
+});
+
+document.getElementById('btn-cerrar-info').addEventListener('click', () => {
+  overlayInfo.classList.remove('visible');
+  if (targetActivo >= 0) { zonaTap.classList.add('activa'); hintTap.classList.add('visible'); }
+});
+
+overlayInfo.addEventListener('click', e => {
+  if (e.target === overlayInfo) overlayInfo.classList.remove('visible');
+});
+
+/* ── Reintentar ── */
+function reintentar() {
+  overlayError.classList.remove('visible');
+  overlayInicio.classList.remove('oculto', 'saliendo');
+}
+
+if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+  console.warn('[AR] ⚠ Requiere HTTPS o localhost para acceder a la cámara.');
+}
+</script>
 </body>
 </html>

@@ -2,8 +2,10 @@
    coleccion.css — LOOK LAB IVVI · Artístico con Texturas
    ============================================================ */
 
-/* ── CABECERA ── */
-.col-header {
+
+   /* ── CABECERA ── */
+
+   .col-header {
   text-align: center;
   padding: var(--space-xl) clamp(18px,5vw,80px) var(--space-l);
   background: var(--cream);
